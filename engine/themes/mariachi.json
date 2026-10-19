@@ -1,0 +1,97 @@
+{
+ "id": "mariachi",
+ "order": 16,
+ "name": "Mariachi",
+ "about": "Code-made: two trumpets on the tune, strummed guitar, plucked bass, violins join at the top. Bright and festive.",
+ "bpm": [
+  124,
+  136
+ ],
+ "key": "G",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "I",
+   "IV",
+   "V7",
+   "I"
+  ],
+  "b": [
+   "IV",
+   "I",
+   "V7",
+   "I"
+  ]
+ },
+ "layers": {
+  "guitar": {
+   "inst": "phys:guitar",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": "x.x. x.x. x.x. x.x.",
+   "notes": "chord",
+   "wide": true,
+   "octave": 3,
+   "gain": -4,
+   "send": 0.15,
+   "strum": 0.01,
+   "hold": 0.35
+  },
+  "bass": {
+   "inst": "phys:upright",
+   "from": 1,
+   "rhythm": "half",
+   "notes": "root",
+   "octave": 2,
+   "gain": -3,
+   "len": 0.8
+  },
+  "trumpet": {
+   "inst": "phys:trumpet",
+   "from": 2,
+   "notes": "melody",
+   "range": [
+    64,
+    84
+   ],
+   "style": "drive",
+   "gain": -2,
+   "send": 0.25,
+   "pan": -0.15,
+   "duckVoice": 7,
+   "vel": 0.9,
+   "legato": 0.85
+  },
+  "trumpet2": {
+   "inst": "phys:trumpet",
+   "from": 3,
+   "notes": "melody",
+   "copy": "trumpet",
+   "shift": -12,
+   "gain": -7,
+   "send": 0.25,
+   "pan": 0.2,
+   "duckVoice": 7
+  },
+  "violins": {
+   "inst": "phys:strings",
+   "from": 4,
+   "notes": "melody",
+   "copy": "trumpet",
+   "shift": 12,
+   "gain": -11,
+   "send": 0.35,
+   "pan": 0.3,
+   "duckVoice": 7
+  }
+ },
+ "fx": {
+  "room": 1.4,
+  "impact": 0
+ },
+ "lp": 11000,
+ "pocket": -3,
+ "end": "phys:guitar",
+ "endOctave": 3,
+ "under": 11
+}

@@ -1,0 +1,105 @@
+{
+ "id": "lofi",
+ "order": 3,
+ "name": "Lo-fi study",
+ "about": "Dusty electric piano 7th chords, lazy swung beat, vinyl crackle. Calm and friendly.",
+ "bpm": [
+  82,
+  92
+ ],
+ "key": "F",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "IVmaj7",
+   "iii7",
+   "ii7",
+   "Imaj7"
+  ],
+  "b": [
+   "ii7",
+   "V7",
+   "Imaj7",
+   "vi7"
+  ]
+ },
+ "layers": {
+  "keys": {
+   "inst": "epiano",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": "x... ..o. .... o...",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -2,
+   "send": 0.25,
+   "swing": 0.6,
+   "hold": 1.6
+  },
+  "bass": {
+   "inst": "bass",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x... ...o ..x. ....",
+   "notes": "root",
+   "octave": 1,
+   "gain": -8,
+   "hold": 0.9,
+   "swing": 0.6
+  },
+  "kick": {
+   "inst": "kick",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x... ...x ..x. ....",
+   "gain": -9,
+   "swing": 0.6
+  },
+  "snare": {
+   "inst": "snare",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -10,
+   "send": 0.15,
+   "lp": 5000
+  },
+  "hat": {
+   "inst": "hat",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x.o. x.o. x.o. x.o.",
+   "gain": -11,
+   "swing": 0.6,
+   "lp": 9000
+  },
+  "lead": {
+   "inst": "pluck",
+   "from": 4,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    4,
+    2,
+    3,
+    1
+   ],
+   "octave": 4,
+   "gain": -12,
+   "send": 0.3,
+   "delay": 0.3,
+   "swing": 0.6,
+   "lp": 3000
+  }
+ },
+ "fx": {
+  "room": 1.8,
+  "impact": 0,
+  "vinyl": 1.0
+ },
+ "lp": 6000,
+ "pocket": -3,
+ "end": "epiano",
+ "endOctave": 3,
+ "under": 12
+}

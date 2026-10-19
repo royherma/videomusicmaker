@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visualizer lab</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231a1815'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23e8623d'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#efe9de;--paper:#fbf8f2;--sunk:#e6dfd2;--ink:#1a1815;--t2:#5e584e;--t3:#9a9285;--line:rgba(26,24,21,.13);--ember:#d2502f;--ok:#2e8f57;--serif:"Iowan Old Style",Palatino,Georgia,serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:13px/1.4 system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+button,select{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--paper);border-bottom:1px solid var(--line)}
+h1{margin:0;font:600 20px var(--serif)}header p{margin:0;color:var(--t2);font-size:12.5px;max-width:520px}
+.ctl{margin-left:auto;display:flex;align-items:center;gap:8px}
+select{height:32px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:0 8px}
+.btn{height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--paper);cursor:pointer}.btn.go{background:var(--ink);color:#fff;border-color:var(--ink);min-width:84px}
+#clock{font:500 12px var(--mono);min-width:92px;text-align:right}
+main{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:12px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card.on{border-color:var(--ember);box-shadow:0 0 0 1px var(--ember)}
+.card h2{margin:0;font:600 17px var(--serif);display:flex;align-items:baseline;gap:8px}.card h2 small{font:400 12px system-ui;color:var(--t2)}
+canvas{display:block;width:100%;height:min(calc(100vh - 220px),640px);object-fit:contain;cursor:zoom-in}
+.row{display:flex;gap:6px}.row .btn{flex:1}
+.zoom canvas.big{position:fixed;inset:20px;width:calc(100vw - 40px);height:calc(100vh - 40px);z-index:20;background:rgba(26,24,21,.55);border-radius:14px;cursor:zoom-out}
+#sent{color:var(--ok);font-size:12px;min-width:120px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Visualizer lab</h1>
+  <p>All three are C3 Rush exactly: same shapes, size and flow. Added on top: every note marks the lines for its instrument and pitch, and the panel rows are the real instruments of the genre.</p>
+  <div class="ctl">
+    <select id="genre"></select>
+    <button class="btn" id="back" title="From the start">Start</button>
+    <button class="btn go" id="play">Play</button>
+    <span id="clock">0:00.0</span>
+  </div>
+</header>
+<main>
+  <section class="card" data-d="glow"><h2>1. Glow <small>each note darkens its lines</small></h2><canvas width="1080" height="1350"></canvas><div class="row"><button class="btn" data-pick="1 Glow">This one</button></div></section>
+  <section class="card" data-d="bead"><h2>2. Beads <small>each note shoots a bead out along its line</small></h2><canvas width="1080" height="1350"></canvas><div class="row"><button class="btn" data-pick="2 Beads">This one</button></div></section>
+  <section class="card" data-d="spark"><h2>3. Sparks <small>each note throws sparks off the tip</small></h2><canvas width="1080" height="1350"></canvas><div class="row"><button class="btn" data-pick="3 Sparks">This one</button></div></section>
+</main>
+<!--chat-->
+<script type="module">
+import * as V from '/viz-lab.js';
+const SLUG = new URLSearchParams(location.search).get('v') ?? 'phonecam-20261014-120404';
+const $ = (id) => document.getElementById(id);
+const music = new Audio(), voice = new Audio(`/work/${SLUG}/voice.opus`);
+music.preload = voice.preload = 'auto';
+let S = null;
+const cards = [...document.querySelectorAll('.card')];
+const state = await (await fetch('/api/state')).json();
+const v = state.videos.find((x) => x.slug === SLUG);
+$('genre').innerHTML = v.tries.map((t) => `<option value="${t.id}">${t.name}</option>`).join('');
+$('genre').value = new URLSearchParams(location.search).get('g') ?? 'violin';
+async function pick(id) {
+  const was = !music.paused, at = music.currentTime || 0;
+  music.pause(); voice.pause();
+  S = V.load(await (await fetch(`/work/${SLUG}/tries/${id}/track.json?x=${Date.now()}`)).json());
+  music.src = `/work/${SLUG}/tries/${id}/bed.opus`;
+  music.currentTime = at; voice.currentTime = at;
+  if (was) start();
+}
+function start() { voice.currentTime = music.currentTime; Promise.all([music.play(), voice.play()]); $('play').textContent = 'Pause'; }
+$('genre').onchange = () => pick($('genre').value);
+$('play').onclick = () => { if (music.paused) start(); else { music.pause(); voice.pause(); $('play').textContent = 'Play'; } };
+$('back').onclick = () => { music.currentTime = 0; voice.currentTime = 0; };
+music.onended = () => { voice.pause(); $('play').textContent = 'Play'; };
+document.addEventListener('keydown', (e) => { if (e.code === 'Space' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') { e.preventDefault(); $('play').click(); } });
+document.querySelectorAll('canvas').forEach((c) => (c.onclick = () => { c.classList.toggle('big'); document.body.classList.toggle('zoom', !!document.querySelector('canvas.big')); }));
+document.querySelectorAll('[data-pick]').forEach((b) => (b.onclick = async () => {
+  cards.forEach((c) => c.classList.toggle('on', c.contains(b)));
+  await fetch('/chat/soundtrack', { method: 'POST', body: JSON.stringify({ text: `Visualizer lab: pick ${b.dataset.pick}`, context: `viz-lab · ${$('genre').value} · at ${music.currentTime.toFixed(1)}s` }) });
+  b.textContent = 'Sent to Claude';
+}));
+window.chatContext = () => `viz-lab · ${$('genre').value} · at ${music.currentTime.toFixed(1)}s`;
+const ctxs = cards.map((c) => [c.dataset.d, c.querySelector('canvas').getContext('2d')]);
+await pick($('genre').value);
+(function loop() {
+  if (S) {
+    const t = music.currentTime || 0;
+    if (!music.paused && Math.abs(voice.currentTime - t) > 0.08) voice.currentTime = t;
+    $('clock').textContent = `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
+    for (const [d, ctx] of ctxs) { try { V[d](ctx, S, t); } catch (err) { console.error(d, err); } }
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

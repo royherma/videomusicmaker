@@ -1,0 +1,113 @@
+{
+ "id": "keys",
+ "order": 2,
+ "name": "Warm keys",
+ "about": "Soft piano in broken chords over a warm pad, light shaker, a beat only at the top. Like your Perplexity reference.",
+ "bpm": [
+  104,
+  112
+ ],
+ "key": "B",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "I",
+   "ii",
+   "vi",
+   "IV"
+  ],
+  "b": [
+   "vi",
+   "IV",
+   "I",
+   "V"
+  ]
+ },
+ "layers": {
+  "piano": {
+   "inst": "piano",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    0,
+    2,
+    1,
+    2,
+    3,
+    2,
+    1,
+    2
+   ],
+   "octave": 3,
+   "gain": 0,
+   "send": 0.3,
+   "vel": 0.75,
+   "accent_first": true
+  },
+  "pad": {
+   "inst": "pad",
+   "from": 2,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -10,
+   "send": 0.4,
+   "len": 1.0
+  },
+  "bass": {
+   "inst": "sub",
+   "from": 2,
+   "rhythm": "half",
+   "notes": "root",
+   "octave": 1,
+   "gain": -11,
+   "len": 0.95
+  },
+  "shaker": {
+   "inst": "shaker",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "o-x- o-x- o-x- o-x-",
+   "gain": -6,
+   "swing": 0.54
+  },
+  "kick": {
+   "inst": "kick",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x... ..x. x... ....",
+   "gain": -5
+  },
+  "clap": {
+   "inst": "clap",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -8,
+   "send": 0.25
+  },
+  "bell": {
+   "inst": "bell",
+   "from": 4,
+   "rhythm": "half",
+   "notes": "arp",
+   "arp": [
+    2,
+    1
+   ],
+   "octave": 5,
+   "gain": -16,
+   "send": 0.4
+  }
+ },
+ "fx": {
+  "room": 2.6,
+  "impact": 0.5
+ },
+ "lp": 8000,
+ "pocket": -3,
+ "end": "piano",
+ "endOctave": 3,
+ "under": 10
+}

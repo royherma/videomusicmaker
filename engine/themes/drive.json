@@ -1,0 +1,117 @@
+{
+ "id": "drive",
+ "order": 4,
+ "name": "Upbeat tech",
+ "about": "Bright plucked arps, four-on-the-floor kick, pumping pad. Fast news-short energy.",
+ "bpm": [
+  118,
+  128
+ ],
+ "key": "A",
+ "mode": "minor",
+ "chords": {
+  "a": [
+   "i",
+   "VI",
+   "III",
+   "VII"
+  ],
+  "b": [
+   "VI",
+   "VII",
+   "i",
+   "i"
+  ]
+ },
+ "duck": {
+  "by": "kick",
+  "depth": 0.6,
+  "layers": [
+   "pad",
+   "bass",
+   "arp"
+  ]
+ },
+ "layers": {
+  "arp": {
+   "inst": "pluck",
+   "from": 2,
+   "rhythm": "16",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    3,
+    2,
+    1,
+    2,
+    1
+   ],
+   "octave": 3,
+   "gain": -2,
+   "send": 0.15,
+   "delay": 0.25,
+   "lp": 4000
+  },
+  "pad": {
+   "inst": "pad",
+   "from": 2,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -10,
+   "send": 0.3,
+   "len": 1.0
+  },
+  "bass": {
+   "inst": "bass",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "..x. ..x. ..x. ..x.",
+   "notes": "root",
+   "octave": 1,
+   "gain": -9,
+   "hold": 0.4
+  },
+  "kick": {
+   "inst": "kick",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x... x... x... x...",
+   "gain": -7
+  },
+  "hat": {
+   "inst": "hat",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "..x. ..x. ..x. ..x.",
+   "gain": -10
+  },
+  "clap": {
+   "inst": "clap",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -7,
+   "send": 0.2
+  },
+  "shaker": {
+   "inst": "shaker",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "-o-o -o-o -o-o -o-o",
+   "gain": -9
+  }
+ },
+ "fx": {
+  "room": 1.8,
+  "impact": 0.7,
+  "open": true
+ },
+ "lp": 9000,
+ "pocket": -3,
+ "end": "pluck",
+ "endOctave": 3,
+ "under": 13
+}

@@ -1,0 +1,89 @@
+{
+ "id": "focus",
+ "order": 5,
+ "name": "Deep focus",
+ "about": "Slow warm pads and a few piano notes, no beat. For serious or thoughtful videos.",
+ "bpm": [
+  68,
+  80
+ ],
+ "key": "E",
+ "mode": "minor",
+ "chords": {
+  "a": [
+   "i",
+   "VI",
+   "III",
+   "VII"
+  ],
+  "b": [
+   "iv",
+   "i",
+   "VI",
+   "VII"
+  ]
+ },
+ "layers": {
+  "pad": {
+   "inst": "pad",
+   "from": 1,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -4,
+   "send": 0.5,
+   "len": 1.0
+  },
+  "piano": {
+   "inst": "piano",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x... ..o. .... o...",
+   "notes": "arp",
+   "arp": [
+    2,
+    0,
+    3,
+    1
+   ],
+   "octave": 4,
+   "gain": -3,
+   "send": 0.5,
+   "hold": 1.5
+  },
+  "low": {
+   "inst": "sub",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "root",
+   "octave": 1,
+   "gain": -12,
+   "len": 0.98
+  },
+  "pulse": {
+   "inst": "pulse",
+   "from": 4,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    0,
+    2,
+    1,
+    2
+   ],
+   "octave": 3,
+   "gain": -6,
+   "send": 0.3,
+   "vel": 0.6
+  }
+ },
+ "fx": {
+  "room": 3.2,
+  "impact": 0.4
+ },
+ "lp": 7000,
+ "pocket": -3,
+ "end": "piano",
+ "endOctave": 3,
+ "under": 11
+}

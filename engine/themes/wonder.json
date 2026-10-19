@@ -1,0 +1,138 @@
+{
+ "id": "wonder",
+ "order": 14,
+ "name": "Orchestral wonder",
+ "about": "Pizzicato and harp, a French horn theme, strings and timpani; glockenspiel sparkles over the theme at the top.",
+ "bpm": [
+  96,
+  106
+ ],
+ "key": "F",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "I",
+   "V",
+   "vi",
+   "IV",
+   "I",
+   "V",
+   "IV",
+   "V"
+  ],
+  "b": [
+   "vi",
+   "IV",
+   "I",
+   "V",
+   "ii7",
+   "IV",
+   "Vsus2",
+   "V"
+  ]
+ },
+ "layers": {
+  "pizz": {
+   "inst": "sf:pizz",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    0,
+    2,
+    1,
+    2
+   ],
+   "octave": 3,
+   "gain": -2,
+   "pan": -0.3,
+   "send": 0.3,
+   "accent_first": true
+  },
+  "harp": {
+   "inst": "sf:harp",
+   "from": 2,
+   "rhythm": "16",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    4,
+    3
+   ],
+   "octave": 3,
+   "gain": -10,
+   "pan": 0.3,
+   "send": 0.4
+  },
+  "horn": {
+   "inst": "sf:horns",
+   "from": 2,
+   "notes": "melody",
+   "range": [
+    53,
+    74
+   ],
+   "style": "lyrical",
+   "gain": -1,
+   "send": 0.5,
+   "duckVoice": 6,
+   "vel": 0.9,
+   "legato": 1.0
+  },
+  "strings": {
+   "inst": "sf:strings",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -10,
+   "send": 0.5,
+   "len": 1.0
+  },
+  "bass": {
+   "inst": "sf:contrabass",
+   "from": 3,
+   "rhythm": "half",
+   "notes": "root",
+   "octave": 1,
+   "gain": -8,
+   "len": 0.95
+  },
+  "glock": {
+   "inst": "sf:glock",
+   "from": 4,
+   "notes": "melody",
+   "copy": "horn",
+   "shift": 24,
+   "gain": -14,
+   "send": 0.4,
+   "pan": 0.2,
+   "duckVoice": 6
+  },
+  "timpani": {
+   "inst": "sf:timpani",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x... .... .... ....",
+   "notes": "root",
+   "octave": 2,
+   "gain": -6,
+   "send": 0.4,
+   "hold": 0.5
+  }
+ },
+ "fx": {
+  "room": 2.8,
+  "impact": 0
+ },
+ "lp": 10000,
+ "pocket": -3,
+ "end": "sf:harp",
+ "endOctave": 3,
+ "under": 11
+}

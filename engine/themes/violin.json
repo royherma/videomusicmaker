@@ -1,0 +1,128 @@
+{
+ "id": "violin",
+ "order": 15,
+ "name": "Violin drive",
+ "about": "Driving string quartet: chugging violas, cello pulse, a violin solo on top; concert drums at the top.",
+ "bpm": [
+  120,
+  132
+ ],
+ "key": "A",
+ "mode": "minor",
+ "chords": {
+  "a": [
+   "i",
+   "VI",
+   "III",
+   "VII",
+   "i",
+   "VI",
+   "iv",
+   "V7"
+  ],
+  "b": [
+   "VI",
+   "VII",
+   "i",
+   "i",
+   "iv",
+   "v",
+   "VI",
+   "V7"
+  ]
+ },
+ "layers": {
+  "viola": {
+   "inst": "sf:viola",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -5,
+   "pan": -0.2,
+   "send": 0.2,
+   "len": 0.45,
+   "accent_first": true
+  },
+  "cello": {
+   "inst": "sf:cello",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x.x. x.x. x.x. x.xx",
+   "notes": "root",
+   "octave": 2,
+   "gain": -3,
+   "pan": 0.2,
+   "send": 0.2,
+   "hold": 0.4
+  },
+  "violin": {
+   "inst": "sf:violin",
+   "from": 2,
+   "notes": "melody",
+   "range": [
+    64,
+    88
+   ],
+   "style": "drive",
+   "gain": -1,
+   "send": 0.3,
+   "pan": -0.1,
+   "duckVoice": 7,
+   "vel": 0.85,
+   "legato": 0.9
+  },
+  "bass": {
+   "inst": "sf:contrabass",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "root",
+   "octave": 1,
+   "gain": -9,
+   "len": 0.98
+  },
+  "kick": {
+   "inst": "orch:kick",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x... .... x... ....",
+   "gain": -6,
+   "send": 0.3
+  },
+  "snare": {
+   "inst": "orch:snare",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -9,
+   "send": 0.3
+  },
+  "pizz": {
+   "inst": "sf:pizz",
+   "from": 4,
+   "rhythm": "16",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    3,
+    2,
+    1
+   ],
+   "octave": 4,
+   "gain": -12,
+   "pan": 0.35,
+   "send": 0.3
+  }
+ },
+ "fx": {
+  "room": 2.2,
+  "impact": 0
+ },
+ "lp": 10000,
+ "pocket": -3,
+ "end": "sf:strings",
+ "endOctave": 3,
+ "under": 11
+}

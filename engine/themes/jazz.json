@@ -1,0 +1,105 @@
+{
+ "id": "jazz",
+ "order": 8,
+ "name": "Jazz cafe",
+ "about": "Piano trio: swung 7th-chord piano, walking upright bass, brushes and ride. Relaxed and smart.",
+ "bpm": [
+  100,
+  112
+ ],
+ "key": "F",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "ii7",
+   "V7",
+   "Imaj7",
+   "vi7"
+  ],
+  "b": [
+   "IVmaj7",
+   "iii7",
+   "ii7",
+   "V7"
+  ]
+ },
+ "layers": {
+  "piano": {
+   "inst": "sf:grand",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": "x.....o.....o...",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -1,
+   "send": 0.25,
+   "swing": 0.62,
+   "hold": 1.2
+  },
+  "bass": {
+   "inst": "sf:upright",
+   "from": 2,
+   "rhythm": "beat",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    1
+   ],
+   "octave": 1,
+   "gain": -3,
+   "len": 0.85
+  },
+  "ride": {
+   "inst": "jazz:ride",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x... x.o. x... x.o.",
+   "gain": -12,
+   "swing": 0.64
+  },
+  "brush": {
+   "inst": "brush:snare",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -7,
+   "send": 0.15
+  },
+  "hat": {
+   "inst": "jazz:pedalhat",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -12
+  },
+  "vibes": {
+   "inst": "sf:vibes",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x... ..x. .... x...",
+   "notes": "arp",
+   "arp": [
+    3,
+    2,
+    4,
+    1
+   ],
+   "octave": 4,
+   "gain": -11,
+   "send": 0.3,
+   "swing": 0.62,
+   "hold": 0.8
+  }
+ },
+ "fx": {
+  "room": 1.6,
+  "impact": 0
+ },
+ "lp": 9000,
+ "pocket": -3,
+ "end": "sf:grand",
+ "endOctave": 3,
+ "under": 11
+}

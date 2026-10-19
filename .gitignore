@@ -1,0 +1,13 @@
+.venv/
+work/
+node_modules/
+__pycache__/
+*.wav
+*.mp4
+*.opus
+.claude/artifacts/
+.claude/handoffs/
+library/soundfonts/
+models/
+*.part
+library/*.jsonl

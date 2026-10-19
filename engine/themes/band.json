@@ -1,0 +1,104 @@
+{
+ "id": "band",
+ "order": 10,
+ "name": "Indie band",
+ "about": "Strummed acoustic guitar, bass guitar, a real drum kit, piano on top. Upbeat and positive.",
+ "bpm": [
+  112,
+  124
+ ],
+ "key": "A",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "I",
+   "V",
+   "vi",
+   "IV"
+  ],
+  "b": [
+   "vi",
+   "IV",
+   "I",
+   "V"
+  ]
+ },
+ "layers": {
+  "guitar": {
+   "inst": "sf:steel",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": "x.xx .xx. x.xx .xx.",
+   "notes": "chord",
+   "wide": true,
+   "octave": 3,
+   "gain": -3,
+   "send": 0.15,
+   "strum": 0.012,
+   "hold": 0.45
+  },
+  "bass": {
+   "inst": "sf:fingerbass",
+   "from": 2,
+   "rhythm": "8",
+   "notes": "root",
+   "octave": 1,
+   "gain": -5,
+   "len": 0.8
+  },
+  "kick": {
+   "inst": "kit:kick",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x... ..x. x... ....",
+   "gain": -5
+  },
+  "snare": {
+   "inst": "kit:snare",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -6,
+   "send": 0.15
+  },
+  "hat": {
+   "inst": "kit:hat",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x.o. x.o. x.o. x.o.",
+   "gain": -11
+  },
+  "piano": {
+   "inst": "sf:grand",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x... ..x. .... x...",
+   "notes": "arp",
+   "arp": [
+    3,
+    4,
+    2
+   ],
+   "octave": 4,
+   "gain": -10,
+   "send": 0.3,
+   "hold": 1.0
+  },
+  "tamb": {
+   "inst": "kit:tambourine",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "..x. ..x. ..x. ..x.",
+   "gain": -12
+  }
+ },
+ "fx": {
+  "room": 1.5,
+  "impact": 0
+ },
+ "lp": 10000,
+ "pocket": -3,
+ "end": "sf:steel",
+ "endOctave": 3,
+ "under": 12
+}

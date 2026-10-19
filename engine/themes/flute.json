@@ -1,0 +1,118 @@
+{
+ "id": "flute",
+ "order": 13,
+ "name": "Guitar and flute",
+ "about": "Fingerpicked nylon guitar, a flute melody, a cello answering it underneath. Warm and open.",
+ "bpm": [
+  86,
+  96
+ ],
+ "key": "E",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "I",
+   "vi",
+   "IV",
+   "V",
+   "I",
+   "iii",
+   "IV",
+   "V"
+  ],
+  "b": [
+   "vi",
+   "IV",
+   "I",
+   "V",
+   "vi",
+   "IV",
+   "ii7",
+   "V"
+  ]
+ },
+ "layers": {
+  "guitar": {
+   "inst": "sf:nylon",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "arp",
+   "wide": true,
+   "arp": [
+    0,
+    3,
+    1,
+    2,
+    0,
+    3,
+    2,
+    4
+   ],
+   "octave": 3,
+   "gain": -1,
+   "send": 0.25,
+   "pan": -0.2,
+   "vel": 0.75,
+   "pedal": true,
+   "accent_first": true
+  },
+  "flute": {
+   "inst": "sf:flute",
+   "from": 2,
+   "notes": "melody",
+   "range": [
+    67,
+    88
+   ],
+   "style": "flowing",
+   "gain": -3,
+   "send": 0.4,
+   "pan": 0.2,
+   "duckVoice": 7,
+   "vel": 0.85,
+   "legato": 1.0
+  },
+  "bass": {
+   "inst": "sf:upright",
+   "from": 3,
+   "rhythm": "half",
+   "notes": "fifth",
+   "octave": 1,
+   "gain": -6,
+   "len": 0.9
+  },
+  "cello": {
+   "inst": "sf:cello",
+   "from": 3,
+   "notes": "melody",
+   "range": [
+    43,
+    62
+   ],
+   "style": "lyrical",
+   "gain": -7,
+   "send": 0.4,
+   "pan": -0.1,
+   "duckVoice": 4,
+   "vel": 0.8,
+   "legato": 1.0
+  },
+  "shaker": {
+   "inst": "kit:shaker",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x-o- x-o- x-o- x-o-",
+   "gain": -12,
+   "swing": 0.55
+  }
+ },
+ "fx": {
+  "room": 2.4,
+  "impact": 0
+ },
+ "lp": 10000,
+ "pocket": -3,
+ "end": "sf:nylon",
+ "endOctave": 3,
+ "under": 11
+}

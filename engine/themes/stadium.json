@@ -1,0 +1,89 @@
+{
+ "id": "stadium",
+ "order": 19,
+ "name": "Stadium stomp",
+ "about": "Code-made: stomp-stomp-clap, a crowd singing 'oh' on the hook, shouted 'hey!' at the top. Big and simple.",
+ "bpm": [
+  80,
+  90
+ ],
+ "key": "E",
+ "mode": "minor",
+ "chords": {
+  "a": [
+   "i",
+   "VI",
+   "VII",
+   "i"
+  ],
+  "b": [
+   "VI",
+   "VII",
+   "i",
+   "i"
+  ]
+ },
+ "layers": {
+  "stomp": {
+   "inst": "phys:taiko",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": "x.x. .... x.x. ....",
+   "notes": "root",
+   "octave": 2,
+   "gain": -3,
+   "send": 0.25
+  },
+  "clap": {
+   "inst": "kit:clap",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -4,
+   "send": 0.3
+  },
+  "bass": {
+   "inst": "phys:upright",
+   "from": 2,
+   "rhythm": "half",
+   "notes": "root",
+   "octave": 2,
+   "gain": -6,
+   "len": 0.9
+  },
+  "crowd": {
+   "inst": "phys:choir-ooh",
+   "from": 2,
+   "notes": "melody",
+   "range": [
+    52,
+    67
+   ],
+   "style": "drive",
+   "gain": -4,
+   "send": 0.5,
+   "duckVoice": 7,
+   "vel": 0.9,
+   "legato": 0.95
+  },
+  "hey": {
+   "inst": "phys:hey",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": ".... .... .... x...",
+   "notes": "root",
+   "octave": 3,
+   "gain": -6,
+   "send": 0.3
+  }
+ },
+ "fx": {
+  "room": 2.2,
+  "impact": 0
+ },
+ "lp": 10000,
+ "pocket": -3,
+ "end": "phys:taiko",
+ "endOctave": 2,
+ "under": 11
+}

@@ -1,0 +1,107 @@
+{
+ "id": "pulse",
+ "order": 1,
+ "name": "Tension pulse",
+ "about": "Low triplet pulse in D minor, no drum kit. Stops dead on the turns, like your robot-hand reference.",
+ "bpm": [
+  116,
+  128
+ ],
+ "key": "D",
+ "mode": "minor",
+ "chords": {
+  "a": [
+   "i",
+   "i",
+   "VI",
+   "VII"
+  ],
+  "b": [
+   "i",
+   "iv",
+   "VI",
+   "VII"
+  ]
+ },
+ "layers": {
+  "pulse": {
+   "inst": "pulse",
+   "from": 2,
+   "rhythm": "triplet8",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    1,
+    0,
+    2
+   ],
+   "octave": 3,
+   "gain": 0,
+   "send": 0.15,
+   "vel": 0.8,
+   "accent_first": true
+  },
+  "low": {
+   "inst": "sub",
+   "from": 2,
+   "rhythm": "bar",
+   "notes": "root",
+   "octave": 1,
+   "gain": -11,
+   "len": 0.98
+  },
+  "strings": {
+   "inst": "pad",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -8,
+   "send": 0.35,
+   "len": 1.0
+  },
+  "heart": {
+   "inst": "tom",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x... .... x... ....",
+   "gain": -6,
+   "send": 0.2
+  },
+  "high": {
+   "inst": "pluck",
+   "from": 4,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    3,
+    2,
+    1,
+    2
+   ],
+   "octave": 4,
+   "gain": -10,
+   "send": 0.3,
+   "delay": 0.25,
+   "lp": 3500
+  },
+  "kick": {
+   "inst": "kick",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x... .... x... ....",
+   "gain": -6
+  }
+ },
+ "fx": {
+  "room": 2.4,
+  "impact": 0.8
+ },
+ "lp": 7000,
+ "pocket": -3,
+ "end": "pad",
+ "endOctave": 3,
+ "under": 9
+}

@@ -1,0 +1,101 @@
+{
+ "id": "island",
+ "order": 20,
+ "name": "Island",
+ "about": "Code-made calypso: steel drum tune, marimba arpeggios, kalimba sparkle, plucked bass and shaker. Sunny.",
+ "bpm": [
+  104,
+  116
+ ],
+ "key": "C",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "I",
+   "IV",
+   "V",
+   "I"
+  ],
+  "b": [
+   "vi",
+   "IV",
+   "I",
+   "V"
+  ]
+ },
+ "layers": {
+  "marimba": {
+   "inst": "phys:marimba",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    1
+   ],
+   "octave": 4,
+   "gain": -6,
+   "send": 0.25,
+   "accent_first": true
+  },
+  "bass": {
+   "inst": "phys:upright",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": "x..x ..x. x..x ..x.",
+   "notes": "root",
+   "octave": 2,
+   "gain": -3,
+   "len": 0.6
+  },
+  "shaker": {
+   "inst": "kit:shaker",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x.xx x.xx x.xx x.xx",
+   "gain": -14
+  },
+  "pan": {
+   "inst": "phys:steelpan",
+   "from": 2,
+   "notes": "melody",
+   "range": [
+    67,
+    86
+   ],
+   "style": "flowing",
+   "gain": -2,
+   "send": 0.3,
+   "duckVoice": 7,
+   "vel": 0.85,
+   "legato": 0.8
+  },
+  "kalimba": {
+   "inst": "phys:kalimba",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "..x. ..x. ..x. ..x.",
+   "notes": "arp",
+   "arp": [
+    2,
+    3,
+    4,
+    3
+   ],
+   "octave": 5,
+   "gain": -12,
+   "send": 0.35
+  }
+ },
+ "fx": {
+  "room": 1.4,
+  "impact": 0
+ },
+ "lp": 11000,
+ "pocket": -3,
+ "end": "phys:marimba",
+ "endOctave": 4,
+ "under": 11
+}

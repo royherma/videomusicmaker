@@ -1,0 +1,98 @@
+{
+ "id": "cinematic",
+ "order": 17,
+ "name": "Cinematic",
+ "about": "Code-made orchestra: driving string ostinato, taiko and timpani, horns and trombones swelling, choir at the top. Epic.",
+ "bpm": [
+  96,
+  106
+ ],
+ "key": "D",
+ "mode": "minor",
+ "chords": {
+  "a": [
+   "i",
+   "VI",
+   "III",
+   "VII"
+  ],
+  "b": [
+   "VI",
+   "VII",
+   "i",
+   "i"
+  ]
+ },
+ "layers": {
+  "strings": {
+   "inst": "phys:spiccato",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "root",
+   "octave": 3,
+   "gain": -4,
+   "send": 0.3,
+   "len": 0.5,
+   "accent_first": true
+  },
+  "taiko": {
+   "inst": "phys:taiko",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x..x ..x. x... x.x.",
+   "notes": "root",
+   "octave": 2,
+   "gain": -4,
+   "send": 0.3
+  },
+  "trombone": {
+   "inst": "phys:trombone",
+   "from": 2,
+   "rhythm": "bar",
+   "notes": "root",
+   "octave": 2,
+   "gain": -8,
+   "send": 0.4,
+   "len": 1.0
+  },
+  "horns": {
+   "inst": "phys:horn",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -10,
+   "send": 0.5,
+   "len": 1.0
+  },
+  "timpani": {
+   "inst": "phys:timpani",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x... .... .... ..x.",
+   "notes": "root",
+   "octave": 2,
+   "gain": -6,
+   "send": 0.4
+  },
+  "choir": {
+   "inst": "phys:choir",
+   "from": 4,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 4,
+   "gain": -12,
+   "send": 0.6,
+   "len": 1.0
+  }
+ },
+ "fx": {
+  "room": 2.6,
+  "impact": 0
+ },
+ "lp": 10000,
+ "pocket": -3,
+ "end": "phys:timpani",
+ "endOctave": 2,
+ "under": 11
+}

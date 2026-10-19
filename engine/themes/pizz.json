@@ -1,0 +1,108 @@
+{
+ "id": "pizz",
+ "order": 9,
+ "name": "Pizzicato",
+ "about": "Plucked strings, glockenspiel, bassoon, a little tambourine. Light and curious, for how-it-works explainers.",
+ "bpm": [
+  110,
+  120
+ ],
+ "key": "C",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "I",
+   "vi",
+   "ii",
+   "V"
+  ],
+  "b": [
+   "IV",
+   "V",
+   "I",
+   "vi"
+  ]
+ },
+ "layers": {
+  "pizz": {
+   "inst": "sf:pizz",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    0,
+    2,
+    1,
+    2,
+    3,
+    2,
+    1,
+    2
+   ],
+   "octave": 3,
+   "gain": 0,
+   "send": 0.2,
+   "accent_first": true
+  },
+  "bass": {
+   "inst": "sf:pizz",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x... ..x. x... ....",
+   "notes": "root",
+   "octave": 2,
+   "gain": -2,
+   "hold": 0.5
+  },
+  "bassoon": {
+   "inst": "sf:bassoon",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x... .... x... x...",
+   "notes": "fifth",
+   "octave": 2,
+   "gain": -8,
+   "send": 0.2,
+   "hold": 0.4
+  },
+  "glock": {
+   "inst": "sf:glock",
+   "from": 3,
+   "rhythm": "steps",
+   "steps": "x..x ..x. .... ....",
+   "notes": "arp",
+   "arp": [
+    3,
+    2,
+    4,
+    1
+   ],
+   "octave": 5,
+   "gain": -12,
+   "send": 0.3
+  },
+  "tamb": {
+   "inst": "kit:tambourine",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -10
+  },
+  "kick": {
+   "inst": "orch:kick",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x... .... x... ....",
+   "gain": -8
+  }
+ },
+ "fx": {
+  "room": 1.8,
+  "impact": 0
+ },
+ "lp": 9000,
+ "pocket": -3,
+ "end": "sf:pizz",
+ "endOctave": 3,
+ "under": 12
+}

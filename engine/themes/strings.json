@@ -1,0 +1,110 @@
+{
+ "id": "strings",
+ "order": 7,
+ "name": "Piano and strings",
+ "about": "Grand piano in broken chords, cello, a string section, timpani at the top. Inspiring, no beat.",
+ "bpm": [
+  76,
+  86
+ ],
+ "key": "D",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "vi",
+   "IV",
+   "I",
+   "V"
+  ],
+  "b": [
+   "IV",
+   "I",
+   "V",
+   "vi"
+  ]
+ },
+ "layers": {
+  "piano": {
+   "inst": "sf:grand",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    3,
+    2,
+    1
+   ],
+   "octave": 3,
+   "gain": 0,
+   "send": 0.35,
+   "hold": 1.5,
+   "accent_first": true
+  },
+  "cello": {
+   "inst": "sf:cello",
+   "from": 2,
+   "rhythm": "half",
+   "notes": "root",
+   "octave": 2,
+   "gain": -5,
+   "send": 0.4,
+   "len": 0.95
+  },
+  "strings": {
+   "inst": "sf:slowstrings",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 4,
+   "gain": -7,
+   "send": 0.5,
+   "len": 1.0
+  },
+  "bass": {
+   "inst": "sf:contrabass",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "root",
+   "octave": 1,
+   "gain": -8,
+   "len": 0.98
+  },
+  "timpani": {
+   "inst": "sf:timpani",
+   "from": 4,
+   "rhythm": "steps",
+   "steps": "x... .... .... x.x.",
+   "notes": "root",
+   "octave": 2,
+   "gain": -6,
+   "send": 0.4,
+   "hold": 0.5
+  },
+  "violin": {
+   "inst": "sf:violin",
+   "from": 4,
+   "rhythm": "half",
+   "notes": "arp",
+   "arp": [
+    2,
+    3
+   ],
+   "octave": 5,
+   "gain": -12,
+   "send": 0.5,
+   "len": 0.95
+  }
+ },
+ "fx": {
+  "room": 3.0,
+  "impact": 0
+ },
+ "lp": 9000,
+ "pocket": -3,
+ "end": "sf:grand",
+ "endOctave": 3,
+ "under": 10
+}

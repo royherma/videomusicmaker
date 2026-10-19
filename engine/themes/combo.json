@@ -1,0 +1,95 @@
+{
+ "id": "combo",
+ "order": 18,
+ "name": "Jazz combo",
+ "about": "Code-made: muted trumpet solo, walking upright bass, swung piano, ride and brushes. Smoky late-night club.",
+ "bpm": [
+  118,
+  132
+ ],
+ "key": "F",
+ "mode": "major",
+ "chords": {
+  "a": [
+   "ii7",
+   "V7",
+   "Imaj7",
+   "vi7"
+  ],
+  "b": [
+   "IVmaj7",
+   "iii7",
+   "ii7",
+   "V7"
+  ]
+ },
+ "layers": {
+  "piano": {
+   "inst": "piano",
+   "from": 1,
+   "rhythm": "steps",
+   "steps": "x.....o.....o...",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -3,
+   "send": 0.25,
+   "swing": 0.62,
+   "hold": 1.0
+  },
+  "bass": {
+   "inst": "phys:upright",
+   "from": 1,
+   "rhythm": "beat",
+   "notes": "arp",
+   "arp": [
+    0,
+    1,
+    2,
+    1
+   ],
+   "octave": 2,
+   "gain": -2,
+   "len": 0.85
+  },
+  "ride": {
+   "inst": "jazz:ride",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": "x... x.o. x... x.o.",
+   "gain": -12,
+   "swing": 0.64
+  },
+  "brush": {
+   "inst": "brush:snare",
+   "from": 2,
+   "rhythm": "steps",
+   "steps": ".... x... .... x...",
+   "gain": -8,
+   "send": 0.15
+  },
+  "trumpet": {
+   "inst": "phys:muted-trumpet",
+   "from": 3,
+   "notes": "melody",
+   "range": [
+    62,
+    81
+   ],
+   "style": "swing",
+   "gain": -3,
+   "send": 0.3,
+   "duckVoice": 7,
+   "vel": 0.85,
+   "legato": 0.9
+  }
+ },
+ "fx": {
+  "room": 1.5,
+  "impact": 0
+ },
+ "lp": 9500,
+ "pocket": -3,
+ "end": "piano",
+ "endOctave": 3,
+ "under": 11
+}

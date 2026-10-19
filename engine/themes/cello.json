@@ -1,0 +1,130 @@
+{
+ "id": "cello",
+ "order": 11,
+ "name": "Cello and piano",
+ "about": "Pedalled piano under a cello solo that comes back as its own theme; strings join, violin doubles it at the top.",
+ "bpm": [
+  72,
+  82
+ ],
+ "key": "D",
+ "mode": "minor",
+ "chords": {
+  "a": [
+   "i",
+   "VI",
+   "III",
+   "VII",
+   "iv",
+   "i",
+   "VI",
+   "V7"
+  ],
+  "b": [
+   "iv",
+   "VI",
+   "i",
+   "V7",
+   "VI",
+   "III",
+   "iv",
+   "V7"
+  ]
+ },
+ "layers": {
+  "piano": {
+   "inst": "sf:grand",
+   "from": 1,
+   "rhythm": "8",
+   "notes": "arp",
+   "wide": true,
+   "arp": [
+    0,
+    2,
+    3,
+    1,
+    4,
+    2,
+    3,
+    1
+   ],
+   "octave": 3,
+   "gain": -2,
+   "send": 0.35,
+   "pan": -0.2,
+   "vel": 0.62,
+   "pedal": true,
+   "accent_first": true
+  },
+  "left": {
+   "inst": "sf:grand",
+   "from": 2,
+   "rhythm": "bar",
+   "notes": "root",
+   "octave": 1,
+   "gain": 1,
+   "send": 0.35,
+   "pan": -0.2,
+   "vel": 0.95,
+   "len": 0.98
+  },
+  "cello": {
+   "inst": "sf:cello",
+   "from": 2,
+   "notes": "melody",
+   "range": [
+    48,
+    69
+   ],
+   "style": "lyrical",
+   "gain": 0,
+   "send": 0.45,
+   "pan": 0.15,
+   "duckVoice": 6,
+   "vel": 0.9,
+   "legato": 1.0
+  },
+  "bass": {
+   "inst": "sf:contrabass",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "root",
+   "octave": 1,
+   "gain": -9,
+   "send": 0.3,
+   "len": 0.98
+  },
+  "strings": {
+   "inst": "sf:strings",
+   "from": 3,
+   "rhythm": "bar",
+   "notes": "chord",
+   "octave": 3,
+   "gain": -12,
+   "send": 0.5,
+   "len": 1.0
+  },
+  "violin": {
+   "inst": "sf:violin",
+   "from": 4,
+   "notes": "melody",
+   "copy": "cello",
+   "shift": 12,
+   "gain": -7,
+   "send": 0.5,
+   "pan": -0.3,
+   "duckVoice": 6,
+   "vel": 0.8,
+   "legato": 1.0
+  }
+ },
+ "fx": {
+  "room": 3.0,
+  "impact": 0
+ },
+ "lp": 10000,
+ "pocket": -3,
+ "end": "sf:grand",
+ "endOctave": 3,
+ "under": 10
+}
