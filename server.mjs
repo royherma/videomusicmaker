@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // VideoMusicMaker page on :4812. Reads what the engine writes under work/ and research/; the page polls /api/rev and redraws.
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, createReadStream, createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -62,12 +62,12 @@ function state() {
     const dir = join(ROOT, 'work', slug), speech = readJson(join(dir, 'speech.json'), {});
     const tries = dirs(join(dir, 'tries')).map((id) => { const f = join(dir, 'tries', id, 'try.json'), t = readJson(f, null); return t && { ...t, mtime: Math.round(statSync(f).mtimeMs) }; }).filter(Boolean);
     const added = Math.round(statSync(dir).birthtimeMs || statSync(join(dir, 'speech.json')).mtimeMs);
-    return { slug, title: speech.title, seconds: speech.seconds, added, speech, ref: readJson(join(ROOT, 'research', slug, 'ref.json'), null), outline: readJson(join(dir, 'outline.json'), null), levels: readJson(join(dir, 'levels.json'), null), run: readJson(join(dir, 'run.json'), null), edits: readJson(join(dir, 'edits.json'), {}), tries, pick: picks.findLast((p) => p.slug === slug) ?? null, job: jobView(jobs.get(slug)), exports: exportsFor(slug), loop: !!readJson(join(dir, 'mode.json'), {}).loop };
+    return { slug, title: speech.title, seconds: speech.seconds, added, speech, ref: readJson(join(ROOT, 'research', slug, 'ref.json'), null), outline: readJson(join(dir, 'outline.json'), null), levels: readJson(join(dir, 'levels.json'), null), run: readJson(join(dir, 'run.json'), null), edits: readJson(join(dir, 'edits.json'), {}), tries, pick: picks.findLast((p) => p.slug === slug) ?? null, job: jobView(jobs.get(slug)), exports: exportsFor(slug), loop: !!readJson(join(dir, 'mode.json'), {}).loop, room: !!readJson(join(dir, 'mode.json'), {}).room };
   });
   const themes = existsSync(join(ROOT, 'engine/themes')) ? readdirSync(join(ROOT, 'engine/themes')).filter((f) => f.endsWith('.json')).map((f) => readJson(join(ROOT, 'engine/themes', f), null)).filter(Boolean).map(({ id, name, about, bpm, key, mode, order, layers }) => ({ id, name, about, bpm, key, mode, order, layers: Object.keys(layers ?? {}) })) : [];
   const wins = (id) => picks.filter((p) => p.theme === id).length;
-  const adding = [...jobs.entries()].filter(([s, j]) => j.adding && (j.running || j.failed) && !videos.some((v) => v.slug === s)).map(([slug, j]) => ({ slug, title: j.title, line: j.line, running: j.running, failed: j.failed, startedAt: j.startedAt }));
-  return { build: readJson(join(ROOT, 'work/build.json'), { steps: [] }), adding, videos, stamps: stamps(), themes: themes.map((t) => ({ ...t, wins: wins(t.id) })).sort((a, b) => b.wins - a.wins || (a.order ?? 9) - (b.order ?? 9)), picks: picks.slice(-30), watermark: process.env.VMM_WATERMARK ?? readJson(join(ROOT, 'brand.json'), {}).watermark ?? '' };
+  const reading = [...jobs.entries()].filter(([s, j]) => j.adding && (j.running || j.failed) && !videos.some((v) => v.slug === s)).map(([slug, j]) => ({ slug, title: j.title, seconds: j.length ?? 0, added: j.startedAt, reading: true, speech: { words: [], sentences: [], sections: [] }, outline: null, levels: null, run: null, edits: {}, tries: [], pick: null, job: jobView(j), exports: {}, loop: j.loop }));
+  return { build: readJson(join(ROOT, 'work/build.json'), { steps: [] }), videos: [...videos, ...reading], stamps: stamps(), themes: themes.map((t) => ({ ...t, wins: wins(t.id) })).sort((a, b) => b.wins - a.wins || (a.order ?? 9) - (b.order ?? 9)), picks: picks.slice(-30), watermark: process.env.VMM_WATERMARK ?? readJson(join(ROOT, 'brand.json'), {}).watermark ?? '' };
 }
 
 function rev() {
@@ -93,11 +93,17 @@ const safe = (s) => String(s ?? '').replace(/[^a-z0-9-]/gi, '');
 const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48);
 const MEDIA = /\.(mp4|mov|m4v|webm|mkv|mp3|wav|m4a)$/i;
 
-function addVideo(path) {
+const setMode = (slug, key, on) => { const file = join(ROOT, 'work', slug, 'mode.json'); writeFileSync(file, JSON.stringify({ ...readJson(file, {}), [key]: on })); };
+
+const probeSeconds = (path) => { try { return Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path], { encoding: 'utf8', timeout: 5000 })) || 0; } catch { return 0; } };
+
+function addVideo(path, loop) {
   const stem = basename(path).replace(/\.[^.]+$/, ''), cam = stem.match(/^phonecam-\d{8}-(\d\d)(\d\d)\d\d$/);
   const title = cam ? `Phonecam take ${cam[1]}:${cam[2]}` : stem, slug = slugify(stem);
   if (jobs.get(slug)?.running) return slug;
-  jobs.set(slug, { adding: true, title, running: true, startedAt: Date.now() });
+  mkdirSync(join(ROOT, 'work', slug), { recursive: true });
+  writeFileSync(join(ROOT, 'work', slug, 'mode.json'), JSON.stringify({ loop: !!loop }));
+  jobs.set(slug, { adding: true, title, video: path, length: probeSeconds(path), loop: !!loop, running: true, startedAt: Date.now() });
   engine(slug, ['speech', path, '--slug', slug, '--title', title], () => engine(slug, ['make', slug, 'all']));
   return slug;
 }
@@ -131,14 +137,14 @@ function stopJob(slug) {
 createServer(async (req, res) => {
   if (!guard(req, res)) return;
   const url = new URL(req.url, 'http://x'), path = decodeURIComponent(url.pathname);
-  if (path === '/api/hello') return json(res, 200, { app: 'videomusicmaker', version: 1 });
+  if (path === '/api/hello') return json(res, 200, { app: 'videomusicmaker', version: 2 });
   if (chatRoutes('soundtrack', req, res, url)) return;
   if (path === '/') { res.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' }); res.end(readFileSync(join(ROOT, 'page/index.html'), 'utf8').replace('<!--chat-->', chatBar('soundtrack')).replace('<!--nav-->', NAV)); return; }
   if (path === '/viz-lab') { res.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' }); res.end(readFileSync(join(ROOT, 'page/viz-lab.html'), 'utf8').replace('<!--chat-->', chatBar('soundtrack'))); return; }
   if (path === '/api/rev') return json(res, 200, { rev: rev(), page: Math.max(...readdirSync(join(ROOT, 'page')).filter((n) => !n.startsWith('viz-lab')).map((n) => statSync(join(ROOT, 'page', n)).mtimeMs)) });
   if (path === '/mm/engine.js') return sendFile(req, res, join(ROOT, 'page/vz-engine.js'));
   if (path === '/api/state') return json(res, 200, state());
-  if (path.startsWith('/video/')) { const speech = readJson(join(ROOT, 'work', safe(path.slice(7)), 'speech.json'), null); return speech ? sendFile(req, res, speech.video) : res.writeHead(404).end(); }
+  if (path.startsWith('/video/')) { const speech = readJson(join(ROOT, 'work', safe(path.slice(7)), 'speech.json'), null); const file = speech?.video ?? jobs.get(safe(path.slice(7)))?.video; return file ? sendFile(req, res, file) : res.writeHead(404).end(); }
   if (req.method === 'POST' && path === '/api/pick') {
     const b = await body(req);
     mkdirSync(join(ROOT, 'library'), { recursive: true });
@@ -153,17 +159,17 @@ createServer(async (req, res) => {
     return json(res, 200, { ok: true });
   }
   if (req.method === 'POST' && path === '/api/add') {
-    const file = String((await body(req)).path ?? '').trim().replace(/^['"]|['"]$/g, '').replace(/^~/, process.env.HOME);
+    const b = await body(req), file = String(b.path ?? '').trim().replace(/^['"]|['"]$/g, '').replace(/^~/, process.env.HOME);
     if (!existsSync(file) || !statSync(file).isFile()) return json(res, 400, { error: `No file at ${file}` });
     if (!MEDIA.test(file)) return json(res, 400, { error: 'That is not a video or sound file' });
-    return json(res, 200, { slug: addVideo(file) });
+    return json(res, 200, { slug: addVideo(file, b.loop) });
   }
   if (req.method === 'POST' && path === '/api/upload') {
     const name = basename(url.searchParams.get('name') ?? 'video.mp4').replace(/[^\w.-]+/g, '-');
     if (!MEDIA.test(name)) return json(res, 400, { error: 'That is not a video or sound file' });
     mkdirSync(join(ROOT, 'work/uploads'), { recursive: true });
     const dest = join(ROOT, 'work/uploads', name);
-    req.pipe(createWriteStream(dest)).on('finish', () => json(res, 200, { slug: addVideo(dest) }));
+    req.pipe(createWriteStream(dest)).on('finish', () => json(res, 200, { slug: addVideo(dest, url.searchParams.get('loop') === '1') }));
     return;
   }
   if (req.method === 'POST' && path === '/api/edits') {
@@ -188,11 +194,12 @@ createServer(async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${basename(file)}"`);
     return sendFile(req, res, file);
   }
-  if (req.method === 'POST' && path === '/api/loop') {
-    const b = await body(req), slug = safe(b.slug);
+  if (req.method === 'POST' && (path === '/api/loop' || path === '/api/room')) {
+    const b = await body(req), slug = safe(b.slug), job = jobs.get(slug), key = path.slice(5);
+    if (job?.running && job.args?.[0] === 'speech') { job[key] = !!b.on; setMode(slug, key, !!b.on); return json(res, 200, { ok: true }); }
     if (!existsSync(join(ROOT, 'work', slug, 'speech.json'))) return json(res, 404, { error: 'No such video' });
     await stopJob(slug);
-    writeFileSync(join(ROOT, 'work', slug, 'mode.json'), JSON.stringify({ loop: !!b.on }));
+    setMode(slug, key, !!b.on);
     engine(slug, ['make', slug, 'all', '--fresh', ...(b.first ? ['--first', safe(b.first)] : [])]);
     return json(res, 200, { ok: true });
   }

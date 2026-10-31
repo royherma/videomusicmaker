@@ -53,9 +53,14 @@ def transcribe(voice, out, terms=''):
     wav.unlink()
     rows = json.loads(Path(out).read_text())['transcription']
     words = [{'w': r['text'].strip(), 't': r['offsets']['from'] / 1000, 'd': (r['offsets']['to'] - r['offsets']['from']) / 1000} for r in rows if r['text'].strip() and not r['text'].strip().startswith('[')]
-    if not terms and len(words) > 20 and not any(END.search(w['w']) for w in words):
-        return transcribe(voice, out, 'Okay. So, here is the thing: it works. Does it?')  # tight cuts can make Whisper drop all punctuation
+    if not terms and len(words) > 20 and ends(words) < len(words) / 30:
+        again = transcribe(voice, out, 'Okay. So, here is the thing: it works. Does it?')  # tight cuts can make Whisper drop punctuation
+        return again if ends(again) > ends(words) else words
     return words
+
+
+def ends(words):
+    return sum(bool(END.search(w['w'])) for w in words)
 
 
 def mark_pivots(sents, tags=None):

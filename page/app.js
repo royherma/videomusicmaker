@@ -228,10 +228,11 @@ function render() {
   if (!video() || !$('video').src) { slug = video()?.slug ?? S.videos[0].slug; return choose(slug); }
   const v = video();
   renderPicker(v);
-  const ready = v.tries.length, steps = [['Speech', !!v.speech], ['Fit', !!v.outline || isRef(v)], ['Compose', ready > 0 || isRef(v)], ['Mix', v.tries.some((t) => t.score) || isRef(v)], ['Pick', !!v.pick]];
+  const ready = v.tries.length, steps = [['Speech', !!v.speech && !v.reading], ['Fit', !!v.outline || isRef(v)], ['Compose', ready > 0 || isRef(v)], ['Mix', v.tries.some((t) => t.score) || isRef(v)], ['Pick', !!v.pick]];
   $('flow').innerHTML = steps.map(([n, ok], i) => `<b class="${ok ? 'ok' : v.job?.running && !ok && steps.slice(0, i).every((x) => x[1]) ? 'run' : ''}">${n}</b>`).join('<span>›</span>');
   if (isRef(v)) renderFacts(v); else renderGenres(v);
   $('loop').checked = !!v.loop; $('loop').disabled = !!v.job?.stopping || isRef(v);
+  $('room').checked = !!v.room; $('room').disabled = !!v.job?.stopping || isRef(v);
   $('match').checked = match; $('match').disabled = isRef(v);
   $('custom').checked = custom; $('build').hidden = custom; $('edit').hidden = !custom;
   renderBuild(); if (custom) renderEdit(v); setGains(); draw(); vzFrame();
@@ -239,25 +240,27 @@ function render() {
 
 function renderPicker(v) {
   const name = (x) => esc(x.title?.replace(/ \(reference\)$/, ''));
-  const coming = (S.adding ?? []).find((a) => a.slug === waitFor && a.running);
-  $('pickName').innerHTML = coming ? `Adding ${esc(coming.title)}...` : `${name(v)}${isRef(v) ? ' <em>reference</em>' : ''}`;
+  $('pickName').innerHTML = uploading ? `Uploading ${esc(uploading)}...` : `${name(v)}${isRef(v) ? ' <em>reference</em>' : ''}`;
   const at = (x) => new Date(x.added).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  const row = (x) => `<div class="item ${x.slug === v.slug ? 'on' : ''} ${x.job?.running ? 'busy' : ''}" data-s="${x.slug}"><b>${name(x)}</b><small>${x.job?.running ? esc(x.job.line).slice(0, 34) : isRef(x) ? clock(x.seconds) : `${at(x)} · ${x.tries.length} tracks · ${clock(x.seconds)}`}</small></div>`;
+  const row = (x) => `<div class="item ${x.slug === v.slug ? 'on' : ''} ${x.job?.running ? 'busy' : ''}" data-s="${x.slug}"><b>${name(x)}</b><small>${x.job?.running ? esc(x.job.line).slice(0, 34) : x.reading && x.job?.failed ? `failed: ${esc(x.job.line ?? '').slice(0, 26)}` : isRef(x) ? clock(x.seconds) : `${at(x)} · ${x.tries.length} tracks · ${clock(x.seconds)}`}</small></div>`;
   const mine = S.videos.filter((x) => !isRef(x)).sort((a, b) => b.added - a.added), refs = S.videos.filter(isRef);
   const days = Map.groupBy(mine, (x) => day(x.added));
-  const adding = (S.adding ?? []).map((a) => `<div class="item busy ${a.slug === waitFor ? 'on' : ''}"><b>${esc(a.title)}</b><small>${a.failed ? 'failed: ' : ''}${esc(a.line ?? '').slice(0, 28)} · ${Math.round((Date.now() - a.startedAt) / 1000)}s</small></div>`).join('');
-  $('menuList').innerHTML = `${adding ? `<h4>Adding now</h4>${adding}` : ''}${[...days].map(([d, xs]) => `<h4>${d}</h4>${xs.map(row).join('')}`).join('')}${refs.length ? `<h4>References</h4>${refs.map(row).join('')}` : ''}`;
-  if (waitFor && S.videos.some((x) => x.slug === waitFor)) { const s = waitFor; waitFor = null; $('addMsg').textContent = ''; menu(false); choose(s); }
+  $('menuList').innerHTML = `${[...days].map(([d, xs]) => `<h4>${d}</h4>${xs.map(row).join('')}`).join('')}${refs.length ? `<h4>References</h4>${refs.map(row).join('')}` : ''}`;
 }
-let waitFor = null;
+let uploading = null;
 const menu = (open) => { $('menu').hidden = !(open ?? $('menu').hidden); };
 $('pickBtn').onclick = (e) => { e.stopPropagation(); menu(); };
 document.addEventListener('mousedown', (e) => { if (!e.target.closest('#picker')) menu(false); });
-const added = async (r) => { const j = await r.json(); if (!r.ok) { $('addMsg').textContent = j.error; return; } waitFor = j.slug; $('addMsg').textContent = 'Reading the speech. The video opens here when that is done; genres fill in after.'; menu(true); rev = ''; poll(); };
-$('addForm').onsubmit = (e) => { e.preventDefault(); const path = $('addPath').value.trim(); if (path) fetch('/api/add', { method: 'POST', body: JSON.stringify({ path }) }).then(added); };
+const added = async (r) => {
+  const j = await r.json(); uploading = null;
+  if (!r.ok) { $('addMsg').textContent = j.error; menu(true); render(); return; }
+  $('addMsg').textContent = ''; $('addPath').value = ''; menu(false); rev = ''; await poll();
+  if (S.videos.some((x) => x.slug === j.slug)) choose(j.slug);
+};
+$('addForm').onsubmit = (e) => { e.preventDefault(); const path = $('addPath').value.trim(); if (path) fetch('/api/add', { method: 'POST', body: JSON.stringify({ path, loop: $('loop').checked }) }).then(added); };
 addEventListener('dragover', (e) => { if ([...e.dataTransfer.items].some((i) => i.kind === 'file')) { e.preventDefault(); document.body.classList.add('dropping'); } });
 addEventListener('dragleave', (e) => { if (!e.relatedTarget) document.body.classList.remove('dropping'); });
-addEventListener('drop', (e) => { e.preventDefault(); document.body.classList.remove('dropping'); const f = [...e.dataTransfer.files].find((x) => /video|audio/.test(x.type) || /\.(mp4|mov|m4v|webm|mkv|mp3|wav|m4a)$/i.test(x.name)); if (!f) return; menu(true); $('addMsg').textContent = `Uploading ${f.name}...`; fetch(`/api/upload?name=${encodeURIComponent(f.name)}`, { method: 'POST', body: f }).then(added); });
+addEventListener('drop', (e) => { e.preventDefault(); document.body.classList.remove('dropping'); const f = [...e.dataTransfer.files].find((x) => /video|audio/.test(x.type) || /\.(mp4|mov|m4v|webm|mkv|mp3|wav|m4a)$/i.test(x.name)); if (!f) return; menu(false); uploading = f.name; render(); fetch(`/api/upload?name=${encodeURIComponent(f.name)}${$('loop').checked ? '&loop=1' : ''}`, { method: 'POST', body: f }).then(added); });
 
 const cardState = new Map(), landedAt = new Map(), LAND_MS = 1500;
 const nth = (n) => (n === 1 ? 'Up next' : `${n}${['th', 'st', 'nd', 'rd'][(n % 100 > 10 && n % 100 < 14) || n % 10 > 3 ? 0 : n % 10]} in line`);
@@ -268,13 +271,13 @@ function renderGenres(v) {
   v.tries.filter((x) => !S.themes.some((t) => t.id === x.id)).forEach((tr) => cards.push({ theme: { id: tr.id, name: tr.name, about: tr.about }, tr }));
   if ((!sel[v.slug] || !v.tries.some((t) => t.id === sel[v.slug])) && v.tries[0]) sel[v.slug] = (v.pick && v.tries.find((t) => t.id === v.pick.theme)?.id) || v.tries[0].id;
   $('midh').firstChild.textContent = 'Genres ';
-  $('midn').textContent = `${v.tries.length} of ${cards.length} made${v.job?.running && !live(v.run, v) ? ` · ${v.job.line}` : ''}`;
+  $('midn').textContent = v.reading ? (v.job?.failed ? 'Could not read the speech' : 'Reading what is said first') : `${v.tries.length} of ${cards.length} made${v.job?.running && !live(v.run, v) ? ` · ${v.job.line}` : ''}`;
   $('genres').classList.toggle('dense', cards.length > 6);
   $('genres').classList.toggle('auto', auto && !custom);
   $('genres').style.setProperty('--el', `${-(Date.now() - autoAt)}ms`);
   const labels = v.tries.find((t) => t.gates)?.gates.map((g) => g.label), queue = live(v.run, v) ? v.run.genres.filter((g) => g.state === 'queued') : [];
   $('genres').innerHTML = cards.map(({ theme, tr }) => {
-    const rg = live(v.run, v) ? v.run.genres.find((g) => g.id === theme.id) : null, busy = rg && ['write', 'check', 'retry'].includes(rg.state), waiting = rg?.state === 'queued';
+    const rg = !v.reading && live(v.run, v) ? v.run.genres.find((g) => g.id === theme.id) : null, busy = rg && ['write', 'check', 'retry'].includes(rg.state), waiting = rg?.state === 'queued';
     const making = !rg && v.job?.running && (v.job.args[2] === theme.id || v.job.args[2] === 'all') && !tr, old = tr && v.outline && !inPlan(v, tr);
     const key = `${v.slug}/${theme.id}`, now = tr && !busy ? 'ready' : busy || waiting || making ? 'busy' : 'none', prev = cardState.get(key);
     cardState.set(key, now); if (now === 'ready' && prev && prev !== 'ready') landedAt.set(key, Date.now());
@@ -284,6 +287,7 @@ function renderGenres(v) {
     const missed = rg?.state === 'retry' ? (rg.gates ?? labels?.map((l) => ({ label: l, ok: !rg.failed?.includes(l) }))) : null;
     const since = rg?.startedAt ? `<time data-since="${rg.startedAt}">${(Date.now() / 1000 - rg.startedAt).toFixed(1)}s</time>` : '';
     const stage = busy || making ? `<div class="prog ${rg?.state ?? 'write'}"><div class="state">${rg?.state === 'retry' ? `<span class="ring"></span><span class="lbl" title="Missed ${esc(rg.failed?.join(', ') ?? 'a check')}, rewriting">Missed “${esc(rg.failed?.[0] ?? 'a check')}” · try ${rg.attempt}</span>` : `<span class="ring"></span><span class="lbl">${rg?.state === 'check' ? 'Checking it against 6 tests' : `Writing the music${rg?.attempt > 1 ? ` · try ${rg.attempt}` : ''}`}</span>`}${since}</div>${pips(missed, rg?.state ?? 'write', labels)}</div>`
+      : v.reading ? `<div class="prog wait"><div class="state wait"><span class="dot"></span>Starts after the speech</div>${pips(null, 'idle', labels)}</div>`
       : waiting ? `<div class="prog wait"><div class="state wait"><span class="dot"></span>${nth(queue.indexOf(rg) + 1)}<button class="btn make now" data-make="${theme.id}" title="Stop the run and write only this one now">Make it now</button></div>${pips(null, 'idle', labels)}</div>` : '';
     const n = (val) => `<b ${landing ? `data-to="${val}"` : ''}>${val}</b>`;
     const nums = tr?.score ? `<div class="nums"><span style="--i:0">${n(tr.bpm)} BPM</span><span style="--i:1">${esc(tr.key)}</span>${tr.score.cueErrorMs != null ? `<span style="--i:2" title="Biggest gap between a spoken cue and the music change">${n(tr.score.cueErrorMs)} ms</span>` : ''}${tr.score.attackMs != null ? `<span style="--i:3" title="After a full stop, time for the music to reach full level again">${n(tr.score.attackMs)} ms back in</span>` : ''}</div>` : '';
@@ -329,6 +333,7 @@ const live = (run, v) => run && !run.done && !run.stoppedAt && !v.job?.stopped &
 const gateText = (gates) => (gates ?? []).map((g) => `${g.ok ? 'Pass' : 'FAIL'}  ${g.label}${g.value != null ? ` (${g.value} ${g.unit}, limit ${g.limit})` : ''}`).join('\n');
 function runClock() {
   const v = video(), run = v?.run, el = document.querySelector('#runSum time');
+  if (el && !run && v?.reading && v.job?.running) el.textContent = clock((Date.now() - v.job.startedAt) / 1000);
   if (!run || !el) return;
   el.textContent = clock((live(run, v) ? Date.now() / 1000 : run.at) - run.startedAt);
 }
@@ -342,6 +347,12 @@ function renderBuild() {
   $('newRun').title = busy ? 'Stop after the track being written. What is written stays; Make it on any card writes just that one.' : 'Write every genre again from scratch for this video. The last run is kept in work/<video>/runs/';
   $('newRun').classList.toggle('stop', !!busy);
   $('newRun').disabled = !!job?.stopping || job?.args?.[0] === 'export';
+  if (!run && v?.reading && job?.running) {
+    $('buildn').textContent = ''; $('runBar').innerHTML = ''; $('stale').innerHTML = '';
+    $('runSum').innerHTML = `<b>Reading</b><span>what is said</span><time>${clock((Date.now() - job.startedAt) / 1000)}</time>`;
+    $('steps').innerHTML = `<li class="now"><span class="ic"></span><b>Read what is said</b><small>${esc(job.line ?? '').slice(0, 30)}</small></li><li class="queued"><span class="ic"></span><b>Plan the music</b><small>in line</small></li><li class="queued"><span class="ic"></span><b>Write ${S.themes.length} genres</b><small>${v.loop ? 'loop' : 'in line'}</small></li>`;
+    return;
+  }
   if (!run) {
     $('buildn').textContent = ''; $('runBar').innerHTML = '';
     $('runSum').innerHTML = job?.failed ? `<span class="why">Run failed: ${esc((job.line ?? '').replace(/^FAILED:\s*/, ''))}</span>` : v && !isRef(v) ? '<span>No run on this video yet. <b>New run</b> writes every genre and checks each one.</span>' : '<span>Reference video: measured, not written.</span>';
@@ -458,7 +469,7 @@ function nextGenre() {
   if (card) gr.scrollTo({ top: card.offsetTop - gr.offsetTop - (gr.clientHeight - card.offsetHeight) / 2, behavior: 'smooth' });
 }
 setInterval(() => { if (auto && Date.now() - autoAt >= 5000) nextGenre(); }, 250);
-$('loop').onchange = async (e) => { const v = video(); e.target.disabled = true; const r = await fetch('/api/loop', { method: 'POST', body: JSON.stringify({ slug: v.slug, on: e.target.checked, first: sel[v.slug] }) }); if (!r.ok) e.target.checked = !e.target.checked; e.target.disabled = false; };
+$('loop').onchange = $('room').onchange = async (e) => { const v = video(); e.target.disabled = true; const r = await fetch(`/api/${e.target.id}`, { method: 'POST', body: JSON.stringify({ slug: v.slug, on: e.target.checked, first: sel[v.slug] }) }); if (!r.ok) e.target.checked = !e.target.checked; e.target.disabled = false; };
 $('match').onchange = (e) => { match = e.target.checked; store.set('match', match); render(); if (P.playing) swapMusic(); };
 $('custom').onchange = (e) => { custom = e.target.checked; store.set('custom', custom); render(); };
 
@@ -537,7 +548,7 @@ function lanes(h) { const top = 22, said = 40, sec = 16, plan = 30, rest = h - t
 function draw() {
   const v = video(), c = $('tl');
   if (!v) return;
-  const [x, w, h] = fit(c), len = v.seconds, X = (t) => L + (t / len) * (w - L - 12), Y = lanes(h), b = bed(v), tr = b?.t, o = tr?.parts ? tr : v.outline;
+  const [x, w, h] = fit(c), len = v.seconds || 1, X = (t) => L + (t / len) * (w - L - 12), Y = lanes(h), b = bed(v), tr = b?.t, o = tr?.parts ? tr : v.outline;
   x.clearRect(0, 0, w, h);
   x.font = '600 10px system-ui'; x.textBaseline = 'middle';
   const label = (txt, [y, hh]) => { x.fillStyle = '#9a9285'; x.fillText(txt.toUpperCase(), 14, y + hh / 2); };

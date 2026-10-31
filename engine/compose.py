@@ -146,6 +146,8 @@ def compose(theme, grid, seconds, seed=()):
                         full = [c for c, (x0, bl) in zip(ch, [b for b in bars if b0 <= b[0] < b0 + nb]) if bl == 4]
                         written += [(b0 + q, d, m, v) for q, d, m, v in mel.line(full, NOTES.index(key), SCALES[mode], 4 * len(full), *L['range'], L.get('style', 'lyrical'), line_seed, max(0, p['level'] - L.get('from', 1)))] if full else []
                 lines[(name, pi)] = written
+                if grid.get('gaps') is not None and L.get('duckVoice'):
+                    written = into_gaps(written, [((a - p['t0']) / spb, (z - p['t0']) / spb) for a, z in grid['gaps'] if z > p['t0'] and a < p['t1']], 0.08 / spb)
                 for pos, d, m, v in written:
                     t = p['t0'] + pos * spb + ((L['swing'] - 0.5) * spb if L.get('swing') and abs(pos % 1 - 0.5) < 1e-6 else 0)
                     dur = min(d * spb * L.get('legato', 0.95), (let_go if stops else end_of) - t)
@@ -246,7 +248,7 @@ def compose(theme, grid, seconds, seed=()):
             x = sy.filt(x, 'low', L['lp']).astype(np.float32)
         if kicks is not None and name in theme['duck'].get('layers', []):
             x = x * kicks
-        if L.get('duckVoice') and grid.get('voice') is not None:
+        if L.get('duckVoice') and grid.get('voice') is not None and grid.get('gaps') is None:
             talk = np.interp(np.arange(n) / SR, np.arange(len(grid['voice'])) / 100, grid['voice'])
             x = x * (10 ** (-L['duckVoice'] * talk / 20)).astype(np.float32)
         pan = L.get('pan', 0)
@@ -283,6 +285,23 @@ def compose(theme, grid, seconds, seed=()):
     if grid.get('loop'):
         stems = {k: wrap(x, int(round(seconds * SR))) for k, x in stems.items()}
     return stems, {k: v for k, v in spans.items() if v}, events
+
+
+def into_gaps(written, gaps, clear, step=0.5):
+    """The line moves only while nobody talks: its notes, in order, go on the 8th grid inside each gap and end `clear` beats before the next word."""
+    if not written:
+        return []
+    out, k = [], 0
+    for g0, g1 in gaps:
+        s, end = max(0.0, np.ceil(g0 / step - 1e-6) * step), g1 - clear
+        first = True
+        while s + min(step, 0.25) <= end + 1e-6:
+            _, d, m, v = written[k % len(written)]
+            d = min(max(d, step), end - s)
+            out.append((s, d, m, min(1.2, v * (1.1 if first else 1))))
+            s += max(step, np.ceil(d / step - 1e-6) * step)
+            k, first = k + 1, False
+    return out
 
 
 def wrap(x, length):

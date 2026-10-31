@@ -18,8 +18,8 @@ header{flex:0 0 54px;display:flex;align-items:center;gap:14px;padding:0 16px;bac
 .logo{display:flex;align-items:center;gap:10px;font:600 21px/1 var(--serif);letter-spacing:-.01em}
 .logo svg{width:28px;height:28px}
 .logo small{font:400 12.5px/1.2 system-ui;color:var(--t2);max-width:230px;letter-spacing:0}
-.picker{position:relative;margin-left:8px}
-#pickBtn{height:36px;display:flex;align-items:center;gap:10px;padding:0 10px 0 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;max-width:440px;font-weight:600}
+.picker{position:relative;margin-left:8px;min-width:120px;flex:0 1 auto}
+#pickBtn{height:36px;display:flex;align-items:center;gap:10px;padding:0 10px 0 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;max-width:min(440px,100%);font-weight:600}
 #pickBtn:hover{border-color:rgba(26,24,21,.35)}#pickBtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#pickBtn svg{width:14px;height:14px;flex:0 0 14px;color:var(--t2)}
 #pickBtn em{font-style:normal;font:600 10px system-ui;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
 .menu{position:absolute;top:44px;left:0;width:460px;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 22px 48px -18px rgba(26,24,21,.4);z-index:40;padding:6px}
@@ -98,7 +98,7 @@ main{--l:262px;--r:318px;--sh:292px;flex:1 1 auto;min-height:640px;display:grid;
 #side{background:none;border:0;gap:12px}
 #side #build,#side #edit{flex:1 1 0}#build{overflow:hidden}#build.squeezed{display:none}#vizCard{flex:0 0 auto}
 .vz{padding:8px 12px 12px}.vz canvas{width:100%;aspect-ratio:1080/1350;display:block;border-radius:10px;background:#f1ebe1}
-.switch{display:flex;align-items:center;gap:8px;margin-left:12px;cursor:pointer;font-weight:600;color:var(--t2);user-select:none;white-space:nowrap}.switch input{display:none}
+.switch{display:flex;align-items:center;gap:8px;margin-left:4px;cursor:pointer;font-weight:600;color:var(--t2);user-select:none;white-space:nowrap}.switch input{display:none}
 @media (max-width:1700px) and (min-width:701px){.logo small{display:none}}
 .switch i{width:34px;height:20px;border-radius:10px;background:var(--sunk);border:1px solid var(--line);position:relative;transition:background .15s}
 .switch i::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}
@@ -265,6 +265,7 @@ body.rec .g h3{font-size:17px}body.rec .g h3 em{display:none}body.rec .g .nums{d
       <form id="addForm"><b>Add a video</b><p>Drop a video anywhere on this page, or paste where it is on this Mac. It writes all genres by itself.</p><div class="row"><input id="addPath" placeholder="/Users/you/Downloads/my-take.mp4" autocomplete="off"><button class="btn go">Add</button></div><small id="addMsg"></small></form></div></div>
   <label class="switch" title="Change the music yourself: genre and energy per part, where it stops, tempo, key, instruments"><input type="checkbox" id="custom"><i></i><span>Customize</span></label>
   <label class="switch" title="Music written to loop with the video: it runs to the last frame and flows straight back into the first. Switching rewrites every genre."><input type="checkbox" id="loop"><i></i><span>Loop</span></label>
+  <label class="switch" title="The solo plays only in the pauses between your words and is never turned down. Off: it plays through and dips under your voice. Changes the 9 genres with a solo. Switching rewrites every genre."><input type="checkbox" id="room"><i></i><span>Solo in the gaps</span></label>
   <label class="switch" title="Moves to the next finished genre every 5 seconds, keeps playing, and follows a run as it writes. Off: nothing moves by itself."><input type="checkbox" id="auto"><i></i><span>Auto-switch</span></label>
   <label class="switch" title="Each part of the video gets the genre whose tempo fits how fast you talk there: faster talking, faster music. Genres come from the same family as the one you picked (strings, jazz, acoustic, beat, sunny), and the one you picked always plays."><input type="checkbox" id="match"><i></i><span>Match each part</span></label>
   <div class="flow" id="flow"></div>

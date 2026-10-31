@@ -20,15 +20,27 @@ def prepare(slug):
     return speech, out
 
 
-def talking(slug):
-    """0..1 per 10 ms: how much the voice is speaking, fast to rise, slow to let go, so a solo comes up in breaths."""
+def voiced(slug):
+    """0..1 per 10 ms, straight from the voice's level: 0 is room noise, 1 is full voice."""
     y, sr = sf.read(WORK / slug / 'voice.wav', always_2d=True)
     y = y.mean(axis=1)
     hop = sr // 100
     if not np.abs(y).max() > 1e-3:
         return np.zeros(len(y) // hop)
     db = 20 * np.log10(np.maximum(np.sqrt(np.mean(y[:len(y) // hop * hop].reshape(-1, hop) ** 2, axis=1)), 1e-6))
-    raw = np.clip((db - (np.percentile(db, 95) - 32)) / 12, 0, 1)
+    return np.clip((db - (np.percentile(db, 95) - 32)) / 12, 0, 1)
+
+
+def gaps(slug, shortest=0.25):
+    """[t0, t1] of every pause between words at least `shortest` s long: where a solo may play without being turned down."""
+    quiet = np.concatenate([[False], voiced(slug) <= 0.1, [False]])
+    edges = np.flatnonzero(np.diff(quiet.astype(np.int8)))
+    return [(a / 100, z / 100) for a, z in zip(edges[::2], edges[1::2]) if z - a >= shortest * 100]
+
+
+def talking(slug):
+    """0..1 per 10 ms: how much the voice is speaking, fast to rise, slow to let go, so a solo comes up in breaths."""
+    raw = voiced(slug)
     out, v = np.zeros_like(raw), 0.0
     for i, r in enumerate(raw):
         v += (r - v) * (0.35 if r > v else 0.1)
@@ -110,6 +122,7 @@ def make(slug, which='all', song=None, under=None, fresh=False, first=None):
         return retrack(slug, song, speech, out)
     edits = read_json(WORK / slug / 'edits.json', {}).get('genres', {})
     voice = talking(slug)
+    room = gaps(slug) if read_json(WORK / slug / 'mode.json', {}).get('room') else None
     todo = sorted((t for t in themes().values() if which in ('all', t['id'])), key=lambda t: (t['id'] != first, t.get('order', 99)))
     run = Run(slug, [t['id'] for t in todo], {t['id']: t['name'] for t in todo}, out, keep=which != 'all')
     for theme in todo:
@@ -121,7 +134,7 @@ def make(slug, which='all', song=None, under=None, fresh=False, first=None):
                 run.stop()
             run.set(theme['id'], state='write', attempt=attempt, startedAt=started)
             print(f"Writing {theme['name']} (try {attempt})", flush=True)
-            grid = {**fit(out, bpm), 'speechEnd': out['speechEnd'], 'loop': out['loop'], 'voice': voice, 'sentences': [x['t'] for x in speech['sentences']]}
+            grid = {**fit(out, bpm), 'speechEnd': out['speechEnd'], 'loop': out['loop'], 'voice': voice, 'sentences': [x['t'] for x in speech['sentences']], 'gaps': room}
             stems, layers, events = compose(theme, grid, speech['seconds'], line_seed)
             bed = master(stems, theme, speech['seconds'], out['loop'])
             run.set(theme['id'], state='check')
@@ -136,7 +149,7 @@ def make(slug, which='all', song=None, under=None, fresh=False, first=None):
             run.set(theme['id'], state='retry', failed=[g['label'] for g in fails])
             print(f"{theme['name']} failed: {', '.join(g['label'] for g in fails)}", flush=True)
         if not t['passed'] and best[0] != attempt:
-            grid = {**fit(out, best[2]), 'speechEnd': out['speechEnd'], 'loop': out['loop'], 'voice': voice, 'sentences': [x['t'] for x in speech['sentences']]}
+            grid = {**fit(out, best[2]), 'speechEnd': out['speechEnd'], 'loop': out['loop'], 'voice': voice, 'sentences': [x['t'] for x in speech['sentences']], 'gaps': room}
             stems, layers, events = compose(theme, grid, speech['seconds'], best[3])
             t = write_try(slug, theme['id'], master(stems, theme, speech['seconds'], out['loop']), {**meta, 'layers': dict(layers), 'attempt': best[0]}, grid, out, events)
         s = t['score']
