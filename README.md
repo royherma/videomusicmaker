@@ -1,115 +1,120 @@
-# VideoMusicMaker
+<p align="center">
+  <img src="docs/images/hero.jpg" alt="VideoMusicMaker: a talking video on the left, 20 genres written for it in the middle, the score timeline with every spoken line and music change at the bottom" width="100%">
+</p>
 
-Background music written to fit what is said in a video. Give it a talking-head video. It writes down the words
-with their timings, plans where the music should change, snaps a beat grid so every change lands on the first word
-of its sentence, and composes 20 genres over that grid. Each track is measured against 6 tests and rewritten if it
-misses one. You listen, compare and pick in a local web page, then export the mp4.
+<h1 align="center">VideoMusicMaker</h1>
 
-No AI service and no API key. Speech-to-text runs locally (Whisper via whisper.cpp). The music itself is code:
-chords, melodies, drums and instruments written by the engine, played through a free SoundFont and its own synths.
-Every video gets its own take: each genre's key, tune and broken-chord pattern are seeded by the video and the take
-number, so two videos never share a track and **New run** (`make --fresh`) writes a new take. Rerunning without
-`--fresh` repeats the take exactly, so edits change only what you edited.
+<p align="center">
+  <b>Music that listens to what you say</b><br>
+  Drop in a video of you talking. Get 20 music tracks written for it, each one changing on your words. Runs on your Mac.
+</p>
 
-```mermaid
-flowchart LR
-  V[Video] --> S[Words + timings<br/>Whisper, local]
-  S --> P[Music plan<br/>parts, energy, full stops]
-  P --> F[Beat grid<br/>each change on its word]
-  F --> C[Compose 20 genres<br/>code + SoundFont]
-  C --> T{6 tests}
-  T -- miss --> C
-  T -- pass --> Page[Listen, compare, pick]
-  Page --> E[Export mp4]
-```
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#the-music-stops-when-you-do">Features</a> ·
+  <a href="#every-track-is-checked">The checks</a> ·
+  <a href="docs/HOW-IT-WORKS.md">How it works</a> ·
+  <a href="https://tools.techguyverlabs.org/t/videomusicmaker">Try it in the browser</a>
+</p>
 
-## Install (macOS)
+---
 
-```sh
-brew install ffmpeg whisper-cpp rubberband fluid-synth node
-scripts/install.sh        # Python env, packages, SoundFont (31 MB), Whisper model (1.6 GB); ends with a check
-bin/soundtrack doctor     # rerun any time: every program, package and file, with the fix for a missing one
-```
+Drop a video on the page. About 2 minutes later (2:16 for the 47-second video above) you have:
 
-Linux works the same with `apt install ffmpeg rubberband-cli fluidsynth libfluidsynth3 nodejs` and whisper.cpp built
-from source. Python 3.11 or newer. Settings: `WHISPER_MODEL` (path to a ggml model), `DEMUCS` (only for learning from
-a reference song), `PORT` (page, default 4812), `VMM_WATERMARK` (text in the visualizer's corner).
+- **20 tracks in 20 genres**, from Lo-fi study to Mariachi, all new, never stock
+- **Changes that land on your words**: the music lifts on a new point, within 60 ms of its first word
+- **Stops where you pause**: it drops out under a punchline and comes back on your next word
+- **Your video with the music mixed under your voice**, as an mp4
 
-## Use
+No AI service, no API key, no upload. Speech-to-text runs on your Mac, and the music is written by code and played through a free SoundFont. Every video gets its own take, so two videos never share a track.
+
+## Install
+
+You need a Mac with Apple silicon, [Homebrew](https://brew.sh) and about 2 GB of free disk.
 
 ```sh
-node server.mjs                                    # http://soundtrack.localhost:4812 - drop a video on the page, everything runs
-bin/soundtrack speech <video.mp4> --slug demo      # or by hand: words, sentences, pauses
-bin/soundtrack make demo all                       # all 20 genres, each checked against the 6 tests
-bin/soundtrack export demo <genre> [--under 10]    # mp4 with that track mixed under the voice (-14 LUFS)
-bin/soundtrack make demo --song <file.mp3>         # re-cut a real song on its own bars to the same cues
-bin/soundtrack themes                              # list the genres
+brew install ffmpeg whisper-cpp rubberband fluid-synth uv node
+git clone https://github.com/royherma/videomusicmaker.git
+cd videomusicmaker
+scripts/install.sh
+node server.mjs
 ```
 
-On the page: the video and its score on the left and bottom, the 20 genre cards in the middle (play any, the music
-crossfades in place), the run on the right. **Customize** gives each part of the plan its own genre, energy and stops.
-**Pick this one** records your choice; genres are ranked by picks.
+Open **http://localhost:4812** and drop a video on the page. `scripts/install.sh` sets up Python, downloads the SoundFont (31 MB) and the Whisper model (1.6 GB), then checks everything. `bin/soundtrack doctor` runs that check again any time.
 
-## The 6 tests
+**Use Claude Code?** Install it as a plugin and ask Claude to score your video:
 
-Every track is rendered, then measured from the audio file. Limits live in `GATES` in `engine/mix.py`.
+```sh
+claude plugin marketplace add royherma/techguyver-tools
+claude plugin install videomusicmaker@techguyver-tools
+```
 
-| Test | Pass when |
+## The music stops when you do
+
+<img src="docs/images/playing.gif" alt="The video plays to 0:30, the line 'When I stop talking, the music stops with me', and the music drops to silence and comes back on the next word" width="100%">
+
+It writes down every word with its timing, then plans the music around what you say: a soft open under the hook, a lift on the main point, a full stop under the line that needs to land. Every change is snapped to a beat grid so it lands on its word, not near it.
+
+## Click to change where it stops
+
+<img src="docs/images/stops.jpg" alt="Score timeline: what is said, the music plan in three parts, and a tooltip on the stop at 0:30 reading 'Click to remove this stop'" width="100%">
+
+The score shows what is said, the music plan and the voice against the music, on one timeline. Click a stop to remove it. Click any pause to add one. Re-cut the same script later and your stops come with it.
+
+## 20 genres, one click apart
+
+<img src="docs/images/genres.jpg" alt="Twenty genre cards, each with its tempo, key, timing result and waveform" width="100%">
+
+Play any genre and the music crossfades in place while the video keeps going. Each card shows its tempo, key and how close its changes landed. **Pick this one** saves your choice, so the genres you pick most move to the top. **Make the mp4** mixes it under your voice.
+
+## Make each part your own
+
+<p align="center"><img src="docs/images/customize.jpg" alt="Customize panel: pick a genre and energy for each part, and tick the lines the music stops under" width="420"></p>
+
+Turn on **Customize** to give each part of the plan its own genre and energy (Soft, Light, Full, Peak) and tick the lines the music stops under. Other switches on the page:
+
+| Switch | What it does |
 | --- | --- |
-| Changes land on the word | every music change within 60 ms of its spoken cue |
+| Loop | Music runs to the last frame and loops back to the start with no bump |
+| Solo in the gaps | A solo plays only in the pauses between your words |
+| Match each part | Each part gets a genre whose tempo fits how fast you talk there |
+
+## Every track is checked
+
+Every track is rendered, then measured from the audio file. A track that misses a check is rewritten at a slower, then a faster tempo.
+
+| Check | Passes when |
+| --- | --- |
+| Changes land on the word | every change within 60 ms of its spoken cue |
 | Tempo holds steady | tempo moves less than 3% |
-| Nothing plays after the last chord | 0 notes after the final hit |
-| Already down before the stop | at least 6 dB quieter going into a full stop |
-| Silent until it comes back | below -25 dB inside the stop |
-| Back in on the word, no fade | full level within 30 ms of the next word |
-| Tempo carries through the loop | Loop mode only: under 3% tempo change from the last part to the first |
-| Loops with no bump | Loop mode only: the 2 bars before the loop point within 3 dB of the 2 after |
+| Clean ending | 0 notes after the final hit |
+| Down before the stop | at least 6 dB quieter going into a full stop |
+| Silent in the stop | below -25 dB inside the stop |
+| Back on the word | full level within 30 ms of the next word |
 
-**Loop mode** (page switch, or `work/<slug>/mode.json` `{"loop": true}`): music runs to the video's last frame (video
-stream length, not file length), ends on the chord that leads into the first, and whatever rings past the end is
-added onto the start. The last part drops back to the opening's energy so the join is level. The mp4 is cut to the video length.
+Loop mode adds two more: tempo carries through the loop point, and the join is within 3 dB. The checks cover timing. Whether a track sounds right is your call on the page.
 
-A miss rewrites the genre at a slower, then a faster tempo; if it still fails, the best try is kept and marked failed.
-The tests check timing, not taste: whether a track sounds good is your call on the page.
-
-## Trim a raw take first (optional)
-
-Phone takes with fumbles: cut by the waveform, not the transcript.
+## Run it from the terminal
 
 ```sh
-D=work/<slug>/trim
-.venv/bin/python -I scripts/trim.py phrases <raw.mp4> $D          # phrases split at real pauses, text on each
-# write $D/keep.json: {"keep": [phrase numbers]}
-.venv/bin/python -I scripts/trim.py cut <raw.mp4> $D <raw>-cut.mp4
-.venv/bin/python -I scripts/trim.py check <raw.mp4> $D            # each kept piece alone through Whisper + wave.png
+bin/soundtrack speech ~/Movies/take.mp4 --slug take   # words, sentences, pauses
+bin/soundtrack make take all                          # all 20 genres, each checked
+bin/soundtrack export take lofi                       # mp4 with that track under the voice
 ```
 
-`phrases` needs WhisperX (`pip install whisperx`, or set `WHISPERX`).
+Runs started here show up on the page too. Each video gets its own folder in `work/<name>/`.
 
-## Add a genre
+## Built on
 
-A genre is one JSON file in `engine/themes/`: key, chords per variant, and per layer the instrument, rhythm, notes,
-the energy level it comes in at, gain and effect sends. New genre = new file, no code.
-
-- `notes: "melody"` writes a solo line (`range` [low, high] MIDI, `style` lyrical|flowing|swing|drive) in 8-bar
-  phrases; `copy` + `shift` doubles another layer; `notes: "walk"` is a walking bass; `duckVoice` (dB) drops a layer
-  while the voice speaks.
-- Instruments: `sf:<name>` plays from the SoundFont (names in `GM` in `engine/synth.py`), `phys:<name>` from the
-  engine's own modelled instruments (`TABLE` in `engine/phys/inst.py`), `kit:` / `brush:` / `jazz:` / `orch:` for drums.
-- `bin/soundtrack learn <video.mp4>` measures the music in a video you like (tempo, key, how far under the voice,
-  where it stops) so you can match it. Needs Demucs.
-
-What two reference videos taught the defaults: music sits 5-9 LU under the voice, keeps 80%+ of its energy under
-400 Hz so it stays out of the voice's range, stops dead under a turn line ("But hold on.") and comes back one level
-higher on the next sentence.
-
-## Files
-
-| Path | What |
+| Job | Model or library |
 | --- | --- |
-| `engine/` | Python: speech, plan, compose, synth, mix, tests |
-| `page/`, `server.mjs` | The local web page (no npm packages) |
-| `work/<slug>/` | Everything made for one video (not in git) |
-| `library/` | Your picks and every render's measured numbers |
+| Words and timings | [Whisper](https://github.com/openai/whisper) large-v3-turbo via [whisper.cpp](https://github.com/ggml-org/whisper.cpp) |
+| Instruments | [GeneralUser GS](https://github.com/mrbumpy409/GeneralUser-GS) SoundFont played by [FluidSynth](https://www.fluidsynth.org) |
+| Analysis and synthesis | [librosa](https://librosa.org), numpy, scipy, numba |
+| Time-stretch, video | [Rubber Band](https://breakfastquay.com/rubberband/), [FFmpeg](https://ffmpeg.org) |
 
-License: MIT (`LICENSE`). Third-party parts and their licenses: `THIRD_PARTY.md`.
+Add a genre with one JSON file, trim a raw take before scoring it, and the full pipeline: [docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md). Third-party licenses: [THIRD_PARTY.md](THIRD_PARTY.md).
+
+## License
+
+MIT. Music you make with VideoMusicMaker is yours. Made by [TechGuyver Labs](https://techguyverlabs.org).

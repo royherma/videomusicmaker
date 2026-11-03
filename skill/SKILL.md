@@ -52,5 +52,5 @@ It prints the mp4 path (`work/<slug>/exports/`). Hand that full path back.
 - Each video gets its own take (key, tune, chord pattern). `make <slug> all --fresh` writes a new take; plain `make`
   repeats the current one exactly.
 - A FAIL in `results` is kept on purpose (best try). Say which test failed (`gates` in `work/<slug>/tries/<id>/try.json`).
-- New genre = a JSON file in `engine/themes/` (README, "Add a genre"). Never edit the engine to change one genre.
+- New genre = a JSON file in `engine/themes/` (docs/HOW-IT-WORKS.md, "Add a genre"). Never edit the engine to change one genre.
 - Costs nothing beyond computer time: no network calls after install.
