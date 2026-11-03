@@ -137,7 +137,7 @@ function stopJob(slug) {
 createServer(async (req, res) => {
   if (!guard(req, res)) return;
   const url = new URL(req.url, 'http://x'), path = decodeURIComponent(url.pathname);
-  if (path === '/api/hello') return json(res, 200, { app: 'videomusicmaker', version: 2 });
+  if (path === '/api/hello') return json(res, 200, { app: 'videomusicmaker', version: 3 });
   if (chatRoutes('soundtrack', req, res, url)) return;
   if (path === '/') { res.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' }); res.end(readFileSync(join(ROOT, 'page/index.html'), 'utf8').replace('<!--chat-->', chatBar('soundtrack')).replace('<!--nav-->', NAV)); return; }
   if (path === '/viz-lab') { res.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' }); res.end(readFileSync(join(ROOT, 'page/viz-lab.html'), 'utf8').replace('<!--chat-->', chatBar('soundtrack'))); return; }

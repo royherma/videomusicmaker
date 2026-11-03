@@ -1,11 +1,50 @@
 """Where the music changes (outline, same for every genre) and the beat grid that makes each change land on its word (fit, per genre)."""
 import math
+import re
 
 import numpy as np
 
 from .common import WORK, read_json, write_json
 
 LONG_GAP, MIN_PLAY = 1.5, 4
+
+
+def inherit_breaks(slug, speech):
+    """A re-cut of the same script starts with the stops Roy added or removed on the earlier cut, matched by words, not times."""
+    if (WORK / slug / 'edits.json').exists() or not speech.get('sentences'):
+        return None
+    mine = {s['text'] for s in speech['sentences']}
+    best = None
+    for d in WORK.iterdir():
+        e, sp = d / 'edits.json', d / 'speech.json'
+        if d.name == slug or not e.exists() or not sp.exists() or not read_json(e, {}).get('breaks'):
+            continue
+        other = read_json(sp)
+        share = len(mine & {s['text'] for s in other.get('sentences', [])}) / len(mine)
+        if share >= 0.6 and (not best or (share, e.stat().st_mtime) > best[:2]):
+            best = (share, e.stat().st_mtime, d.name, other, read_json(e))
+    if not best:
+        return None
+    _, _, name, other, edits = best
+    lead = lambda sp, t: ' '.join(re.sub(r'[^a-z0-9]', '', w['w'].lower()) for w in [w for w in sp['words'] if w['t'] < t][-3:])
+    breaks = {}
+    for key, on in edits['breaks'].items():
+        s = next((s for s in other['sentences'] if f"{s['t']:.2f}" == key), None)
+        if s:
+            hit = next((n['t'] for n in speech['sentences'] if n['text'] == s['text']), None)
+        else:
+            hit = next((g['t'] for g in speech.get('pauses', []) if g['d'] >= 0.4 and lead(speech, g['t']) == lead(other, float(key))), None)
+        if hit is not None:
+            breaks[f'{hit:.2f}'] = on
+    if breaks:
+        write_json(WORK / slug / 'edits.json', {'breaks': breaks, 'from': name})
+        print(f'Stops copied from {name}: {breaks}', flush=True)
+    return breaks
+
+
+def clause_end(words, t):
+    before = [w for w in words if w['t'] < t]
+    return bool(before) and before[-1]['w'].rstrip('"\')').endswith((',', ';', ':', '-', '—'))
 
 
 def outline(speech, max_breaks=None, edits=None, loop=False):
@@ -27,9 +66,10 @@ def outline(speech, max_breaks=None, edits=None, loop=False):
     breaks = [(sents[i]['t'] - 0.04, sents[i + 1]['t'], sents[i]['text'], sents[i + 1]['text']) for i in sorted(chosen)]
     for g in sorted(speech.get('pauses', []), key=lambda g: -g['d']):
         a, z = g['t'], g['t'] + g['d']
-        if g['d'] < LONG_GAP or not sents or a < sents[0]['t'] + 2 or z > end - 2 or forced.get(f'{a:.2f}') is False:
+        want = forced.get(f'{a:.2f}')
+        if (g['d'] < LONG_GAP and not want) or not sents or a < sents[0]['t'] + 2 or z > end - 2 or want is False:
             continue
-        if not any(abs(s['t'] - z) < 0.3 for s in sents[1:]):
+        if not want and not any(abs(s['t'] - z) < 0.3 for s in sents[1:]) and not clause_end(speech.get('words', []), a):
             continue  # a pause inside a sentence is a breath, not a turn
         if all(z + MIN_PLAY <= b[0] or a >= b[1] + MIN_PLAY for b in breaks):
             breaks.append((a, z, next((s['text'] for s in reversed(sents) if s['t'] < a), ''), next((s['text'] for s in sents if s['t'] >= z - 0.05), '')))

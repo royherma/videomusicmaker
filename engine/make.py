@@ -6,13 +6,14 @@ import soundfile as sf
 from .common import WORK, loudness, read_json, video_seconds, write_json
 from .compose import compose, take_key, themes, with_edits
 from .mix import master, write_levels, write_try
-from .plan import fit, outline
+from .plan import fit, inherit_breaks, outline
 
 
 def prepare(slug):
     speech, loop = read_json(WORK / slug / 'speech.json'), bool(read_json(WORK / slug / 'mode.json', {}).get('loop'))
     if loop:
         speech['seconds'] = round(video_seconds(speech['video']), 3)
+    inherit_breaks(slug, speech)
     out = outline(speech, edits=read_json(WORK / slug / 'edits.json', {}), loop=loop)
     out['voiceLufs'] = -18.0 if speech.get('noVoice') else loudness(WORK / slug / 'voice.wav')[0]  # no voice: music sits as if under a typical one
     write_json(WORK / slug / 'outline.json', out)

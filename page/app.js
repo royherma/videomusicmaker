@@ -428,7 +428,10 @@ function renderEdit(v) {
   const ps = plays(v), p = ps[Math.min(part, ps.length - 1)] ?? ps[0], base = v.tries.find((t) => t.id === sel[v.slug]), theme = S.themes.find((t) => t.id === base?.id);
   const ready = v.tries.filter((t) => inPlan(v, t)), m = mixes[v.slug] ?? [], cur = m[part] && ready.some((t) => t.id === m[part]) ? m[part] : '';
   const lvKey = p.t0.toFixed(2), lv = draft.levels?.[lvKey] ?? p.level;
-  const on = (s) => draft.breaks?.[s.t.toFixed(2)] ?? v.outline.parts.some((q) => q.kind === 'break' && Math.abs(q.t0 - (s.t - 0.04)) < 0.03), turns = v.speech.sentences.slice(0, -1).filter((s) => s.t > 2 && (s.pivot || on(s) || (s.n <= 8 && s.end - s.t <= 3.2)));
+  const on = (s) => draft.breaks?.[s.t.toFixed(2)] ?? v.outline.parts.some((q) => q.kind === 'break' && Math.abs(q.t0 - (s.gap ? s.t : s.t - 0.04)) < 0.03);
+  const before = (t) => v.speech.words.filter((w) => w.t < t).slice(-3).map((w) => w.w).join(' '), last = v.speech.sentences.at(-1)?.end ?? v.seconds;
+  const gaps = (v.speech.pauses ?? []).filter((g) => g.d >= 0.4 && g.t > 2 && g.t + g.d < last - 2).map((g) => ({ t: g.t, gap: true, text: `${g.d.toFixed(1)} s pause after "...${before(g.t)}"` }));
+  const turns = [...v.speech.sentences.slice(0, -1).filter((s) => s.t > 2 && (s.pivot || on(s) || (s.n <= 8 && s.end - s.t <= 3.2))), ...gaps].sort((a, b) => a.t - b.t);
   const g = (draft.genres ?? {})[base?.id] ?? {}, bpm = g.bpm ?? base?.bpm, key = g.key ?? theme?.key, mute = g.mute ?? [];
   const dirty = !same(draft, draftSaved), outlineDirty = !same({ b: draft.breaks, l: draft.levels }, { b: draftSaved.breaks, l: draftSaved.levels });
   $('editn').textContent = v.job?.running ? v.job.line.slice(0, 40) : `part ${part + 1} of ${ps.length}`;
@@ -437,7 +440,7 @@ function renderEdit(v) {
   <p class="note" style="margin-bottom:6px">Click a block in the Music plan row to pick a part.</p>
   <select id="edGenre"><option value="">Same as the whole track (${esc(base?.name ?? 'none picked')})</option>${ready.filter((t) => t.id !== base?.id).map((t) => `<option value="${t.id}" ${cur === t.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select>
   <h5 style="margin-top:8px">Energy <span>${lv === p.level ? 'auto' : 'changed'}</span></h5><div class="seg2" id="edLevel">${[1, 2, 3, 4].map((n) => `<button data-lv="${n}" class="${n === lv ? 'on' : ''}">${['Soft', 'Light', 'Full', 'Peak'][n - 1]}</button>`).join('')}</div></div>
-  <div class="ed"><h5>Music stops under <span>${turns.filter(on).length} of ${turns.length}</span></h5>${turns.map((s) => `<label class="turn"><input type="checkbox" data-turn="${s.t.toFixed(2)}" ${on(s) ? 'checked' : ''}><span>${esc(s.text)}</span><small>${clock(s.t)}</small></label>`).join('') || '<p class="note">No short lines in this video.</p>'}</div>
+  <div class="ed"><h5>Music stops under <span>${turns.filter(on).length} of ${turns.length}</span></h5>${turns.map((s) => `<label class="turn"><input type="checkbox" data-turn="${s.t.toFixed(2)}" ${on(s) ? 'checked' : ''}><span>${s.gap ? `<i>${esc(s.text)}</i>` : esc(s.text)}</span><small>${clock(s.t)}</small></label>`).join('') || '<p class="note">No short lines in this video.</p>'}</div>
   ${base?.kind === 'code' && theme ? `<div class="ed"><h5>${esc(base.name)} <span>whole track</span></h5>
   <div class="row"><input type="range" id="edBpm" min="${Math.round(theme.bpm[0] * 0.85)}" max="${Math.round(theme.bpm[1] * 1.15)}" step="1" value="${Math.round(bpm)}"><b style="font:600 12px var(--mono);min-width:64px">${Math.round(bpm)} BPM</b></div>
   <div class="row" style="margin-top:6px"><select id="edKey">${KEYS.map((k) => `<option ${k === key ? 'selected' : ''}>${k}</option>`).join('')}</select><span class="note">${esc(theme.mode)}</span></div>
@@ -627,9 +630,26 @@ function wrap(x, text, a, y, w, lh, max) { const words = text.split(' '); let li
 
 const tl = $('tl');
 const timeAt = (e) => { const r = tl.getBoundingClientRect(), v = video(); return Math.max(0, ((e.clientX - r.left - L) / (r.width - L - 12)) * v.seconds); };
+function stopAt(v, t, y, Y) {
+  if (!v || isRef(v) || !v.outline || y < Y.plan[0] - 4 || y > Y.plan[0] + Y.plan[1] + 4) return null;
+  const br = v.outline.parts.find((q) => q.kind === 'break' && t >= q.t0 && t < q.t1);
+  if (br) { const s = v.speech.sentences.find((q) => Math.abs(q.t - 0.04 - br.t0) < 0.03); return { key: (s ? s.t : br.t0).toFixed(2), on: false, say: 'Click to remove this stop' }; }
+  const g = (v.speech.pauses ?? []).find((q) => q.d >= 0.4 && t >= q.t - 0.15 && t <= q.t + q.d + 0.15 && !v.outline.parts.some((b) => b.kind === 'break' && b.t0 < q.t + q.d && b.t1 > q.t));
+  return g ? { key: g.t.toFixed(2), on: true, say: `Click to stop the music in this ${g.d.toFixed(1)} s pause` } : null;
+}
+async function toggleStop(v, hit) {
+  const edits = structuredClone(v.edits ?? {});
+  edits.breaks = { ...(edits.breaks ?? {}), [hit.key]: hit.on };
+  if (draftOf === v.slug) { draft = structuredClone(edits); draftSaved = structuredClone(edits); }
+  $('tip').innerHTML = hit.on ? 'Adding the stop, rewriting every genre...' : 'Removing the stop, rewriting every genre...';
+  await fetch('/api/edits', { method: 'POST', body: JSON.stringify({ slug: v.slug, edits, which: 'all' }) });
+  rev = ''; poll();
+}
 tl.onclick = (e) => {
   const r = tl.getBoundingClientRect(), v = video(), Y = lanes(r.height), y = e.clientY - r.top, t = timeAt(e);
   if (e.clientX - r.left <= L) return;
+  const hit = stopAt(v, t, y, Y);
+  if (hit) { toggleStop(v, hit); return; }
   if (custom && !isRef(v) && y >= Y.plan[0] - 4 && y <= Y.plan[0] + Y.plan[1] + 4) { const k = plays(v).findIndex((p) => t >= p.t0 && t < p.t1); if (k >= 0) { part = k; renderEdit(v); draw(); return; } }
   seek(t);
 };
@@ -639,6 +659,9 @@ tl.onmousemove = (e) => {
   const p = (bed(v)?.t ?? v.outline)?.parts?.find((q) => t >= q.t0 && t < q.t1);
   const tip = $('tip');
   const lines = [`<b>${clock(t)}</b>`, s ? `"${esc(s.text)}"${s.pivot ? ' <i>(turn: music stops under it)</i>' : ''}` : '', p ? `${p.kind === 'break' ? 'Music stops' : `${esc(p.label ?? '')}, level ${p.level} of 4, ${p.bpm?.toFixed(1)} BPM, ${p.beats} beats`}` : ''].filter(Boolean);
+  const hit = stopAt(v, t, e.clientY - r.top, lanes(r.height));
+  if (hit) lines.push(`<i>${hit.say}</i>`);
+  tl.style.cursor = hit ? 'pointer' : '';
   tip.innerHTML = lines.join('<br>'); tip.style.display = 'block';
   tip.style.left = `${Math.min(r.width - 390, Math.max(8, e.clientX - r.left + 12))}px`; tip.style.top = `${e.clientY - r.top + 30}px`;
   if (!P.playing) draw();
