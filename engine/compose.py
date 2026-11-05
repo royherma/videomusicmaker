@@ -142,9 +142,11 @@ def compose(theme, grid, seconds, seed=()):
                         written = [w for w in written if w[0] < button - 1e-6] + [(button, 2, root, 0.95)]
                 else:
                     written = []
-                    for b0, ch, nb in blocks:
+                    opening = grid.get('loop') and pi == 0 and len(blocks) > 1
+                    for b0, ch, nb in ([(0, bar_chords, n_beats)] if opening else blocks):
+                        starts = [x0 for x0, bl in bars if b0 <= x0 < b0 + nb and bl == 4]
                         full = [c for c, (x0, bl) in zip(ch, [b for b in bars if b0 <= b[0] < b0 + nb]) if bl == 4]
-                        written += [(b0 + q, d, m, v) for q, d, m, v in mel.line(full, NOTES.index(key), SCALES[mode], 4 * len(full), *L['range'], L.get('style', 'lyrical'), line_seed, max(0, p['level'] - L.get('from', 1)))] if full else []
+                        written += [(starts[int(q // 4)] + q % 4, d, m, v) for q, d, m, v in mel.line(full, NOTES.index(key), SCALES[mode], 4 * len(full), *L['range'], L.get('style', 'lyrical'), line_seed, max(0, p['level'] - L.get('from', 1)))] if full else []
                 lines[(name, pi)] = written
                 if grid.get('gaps') is not None and L.get('duckVoice'):
                     written = into_gaps(written, [((a - p['t0']) / spb, (z - p['t0']) / spb) for a, z in grid['gaps'] if z > p['t0'] and a < p['t1']], 0.08 / spb)

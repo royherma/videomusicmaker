@@ -25,7 +25,7 @@ export const TUNE = { marks: "", gather: 0, slowMorph: 0, flow: 0, startDelay: 0
 const N = 144;
 export const STRAND_COUNT = N;
 const CAM_DIST = 7;
-const INK = [28, 26, 22], PAPER = "#f1ebe1";
+const INK = [232, 236, 247], PAPER = "#05060a";
 const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const MONO = 'Menlo, "SF Mono", monospace';
 const VIEW = { cx: 540, cy: 480, top: 150, bottom: 800, scale: 300 };
@@ -220,7 +220,7 @@ function paper(ctx) {
     paperNoise.width = W; paperNoise.height = H;
     const g = paperNoise.getContext("2d"), r = rng(7);
     g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
-    for (let i = 0; i < 26000; i++) { g.fillStyle = `rgba(80,60,30,${r() * 0.05})`; g.fillRect(r() * W, r() * H, 1.2, 1.2); }
+    for (let i = 0; i < 26000; i++) { g.fillStyle = `rgba(124,196,255,${r() * 0.05})`; g.fillRect(r() * W, r() * H, 1.2, 1.2); }
   }
   ctx.drawImage(paperNoise, 0, 0);
 }
@@ -341,7 +341,7 @@ function drawStrands(ctx, st, f, t, sh, m, cam) {
   ctx.restore();
 }
 
-const EMBER = (a) => `rgba(210,80,47,${a})`;
+const EMBER = (a) => `rgba(124,196,255,${a})`;
 function drawMarks(ctx, marks, m, cam) {
   const P = (p, bill) => billboard(project(p, m, cam), p, bill);
   for (const [a, b, hit, age, bill] of marks) {

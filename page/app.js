@@ -5,8 +5,8 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const day = (ms) => { const d = new Date(ms), n = new Date(), y = new Date(n - 864e5); return d.toDateString() === n.toDateString() ? 'Today' : d.toDateString() === y.toDateString() ? 'Yesterday' : d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }); };
 const clock = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
 const store = { get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
-const LEVEL = ['#e9e1d3', '#f3c9b6', '#eda184', '#e2764f', '#c9472a'];
-const HUE = ['#c9472a', '#1f6f6b', '#b98a1e', '#5b4fa8', '#2e8f57', '#a8326b', '#3a6ea5', '#7a5c2e', '#4d4d4d'];
+const LEVEL = ['#1b2333', '#22344d', '#2f5277', '#4f86bf', '#7cc4ff'];
+const HUE = ['#7cc4ff', '#ff7aa8', '#ffb14a', '#a78bfa', '#52e6a0', '#4fd8f0', '#7c8bff', '#ffc15a', '#a9b4cc'];
 const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const PLAY = '<svg viewBox="0 0 14 14"><path d="M3 1.5v11l9.5-5.5z" fill="currentColor"/></svg>', PAUSE = '<svg viewBox="0 0 14 14"><path d="M3 1.5h3v11H3zM8 1.5h3v11H8z" fill="currentColor"/></svg>';
 
@@ -392,7 +392,7 @@ $('steps').addEventListener('click', (e) => {
   autoAt = Date.now(); sel[v.slug] = id; store.set('sel', sel); render(); if (P.playing) swapMusic();
   const card = $('genres').querySelector(`.g[data-id="${id}"]`);
   card.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
-  card.animate([{ boxShadow: '0 0 0 4px rgba(210,80,47,.45)' }, { boxShadow: '0 0 0 1px var(--ember)' }], { duration: 900, easing: 'ease-out' });
+  card.animate([{ boxShadow: '0 0 0 4px rgba(124,196,255,.45)' }, { boxShadow: '0 0 0 1px var(--ember)' }], { duration: 900, easing: 'ease-out' });
 });
 $('newRun').onclick = async () => {
   const v = video(); if (!v) return;
@@ -528,7 +528,7 @@ function spark(c, level) {
   if (!level?.length) return;
   x.beginPath(); x.moveTo(0, h);
   level.forEach((l, i) => x.lineTo((i / (level.length - 1)) * w, h - Math.max(0, Math.min(1, (l + 24) / 30)) * h));
-  x.lineTo(w, h); x.closePath(); x.fillStyle = 'rgba(210,80,47,.22)'; x.fill(); x.strokeStyle = '#d2502f'; x.lineWidth = 1; x.stroke();
+  x.lineTo(w, h); x.closePath(); x.fillStyle = 'rgba(124,196,255,.22)'; x.fill(); x.strokeStyle = '#7cc4ff'; x.lineWidth = 1; x.stroke();
 }
 
 let ticking = false;
@@ -553,24 +553,24 @@ function draw() {
   if (!v) return;
   const [x, w, h] = fit(c), len = v.seconds || 1, X = (t) => L + (t / len) * (w - L - 12), Y = lanes(h), b = bed(v), tr = b?.t, o = tr?.parts ? tr : v.outline;
   x.clearRect(0, 0, w, h);
-  x.font = '600 10px system-ui'; x.textBaseline = 'middle';
-  const label = (txt, [y, hh]) => { x.fillStyle = '#9a9285'; x.fillText(txt.toUpperCase(), 14, y + hh / 2); };
+  x.font = '600 10px "Hanken Grotesk",system-ui'; x.textBaseline = 'middle';
+  const label = (txt, [y, hh]) => { x.fillStyle = '#8f9ab5'; x.fillText(txt.toUpperCase(), 14, y + hh / 2); };
   const every = [10, 20, 30, 60].find((n) => X(n) - X(0) >= 36) ?? 60;
-  for (let s = 0; s <= len; s += 5) { const px = X(s); x.fillStyle = s % 10 ? 'rgba(26,24,21,.08)' : 'rgba(26,24,21,.16)'; x.fillRect(px, 18, 1, h - 18); if (s % every === 0) { x.fillStyle = '#9a9285'; x.font = '500 10px ui-monospace,Menlo'; x.fillText(clock(s), px + 3, 10); } }
-  x.font = '600 10px system-ui';
-  label('What is said', Y.said); label('Sections', Y.sec); label(isRef(v) ? 'Their music' : 'Music plan', Y.plan); x.fillStyle = '#1f6f6b'; x.fillText('VOICE', 14, Y.loud[0] + Y.loud[1] / 2 - 6); x.fillStyle = '#d2502f'; x.fillText('VS MUSIC', 14, Y.loud[0] + Y.loud[1] / 2 + 7); if (isRef(v) || !Object.keys(tr?.layers ?? {}).length) label(isRef(v) ? 'Drums' : 'Layers', Y.lay);
+  for (let s = 0; s <= len; s += 5) { const px = X(s); x.fillStyle = s % 10 ? 'rgba(232,236,247,.08)' : 'rgba(232,236,247,.16)'; x.fillRect(px, 18, 1, h - 18); if (s % every === 0) { x.fillStyle = '#8f9ab5'; x.font = '500 10px "JetBrains Mono",ui-monospace,Menlo'; x.fillText(clock(s), px + 3, 10); } }
+  x.font = '600 10px "Hanken Grotesk",system-ui';
+  label('What is said', Y.said); label('Sections', Y.sec); label(isRef(v) ? 'Their music' : 'Music plan', Y.plan); x.fillStyle = '#ff7aa8'; x.fillText('VOICE', 14, Y.loud[0] + Y.loud[1] / 2 - 6); x.fillStyle = '#7cc4ff'; x.fillText('VS MUSIC', 14, Y.loud[0] + Y.loud[1] / 2 + 7); if (isRef(v) || !Object.keys(tr?.layers ?? {}).length) label(isRef(v) ? 'Drums' : 'Layers', Y.lay);
 
   for (const s of v.speech.sentences) {
     const a = X(s.t), z = Math.max(a + 2, X(s.end)), [y, hh] = Y.said;
-    x.fillStyle = s.pivot ? 'rgba(210,80,47,.85)' : 'rgba(31,111,107,.16)';
+    x.fillStyle = s.pivot ? 'rgba(124,196,255,.85)' : 'rgba(255,122,168,.16)';
     rr(x, a, y, z - a - 1, hh, 4); x.fill();
-    if (z - a > 26) { x.save(); x.beginPath(); x.rect(a + 4, y, z - a - 8, hh); x.clip(); x.fillStyle = s.pivot ? '#fff' : '#1f4f4c'; x.font = '500 11px system-ui'; wrap(x, s.text, a + 5, y + 13, z - a - 9, 13, 3); x.restore(); }
+    if (z - a > 26) { x.save(); x.beginPath(); x.rect(a + 4, y, z - a - 8, hh); x.clip(); x.fillStyle = s.pivot ? '#06101f' : '#ffc2d6'; x.font = '500 11px "Hanken Grotesk",system-ui'; wrap(x, s.text, a + 5, y + 13, z - a - 9, 13, 3); x.restore(); }
   }
-  x.fillStyle = 'rgba(31,111,107,.55)';
+  x.fillStyle = 'rgba(255,122,168,.55)';
   for (const wd of v.speech.words) x.fillRect(X(wd.t), Y.said[0] + Y.said[1] - 3, 1, 3);
-  if (v.speech.noVoice) { x.fillStyle = '#1f4f4c'; x.font = '500 12px system-ui'; x.fillText('No voice: music plays start to end', L, Y.said[0] + Y.said[1] / 2); }
+  if (v.speech.noVoice) { x.fillStyle = '#ffc2d6'; x.font = '500 12px "Hanken Grotesk",system-ui'; x.fillText('No voice: music plays start to end', L, Y.said[0] + Y.said[1] / 2); }
   const secs = v.speech.sections ?? [];
-  secs.forEach((s, i) => { const a = X(s.t), z = X(secs[i + 1]?.t ?? len), [y, hh] = Y.sec; x.fillStyle = i % 2 ? '#e6dfd2' : '#ddd4c4'; rr(x, a, y, z - a - 2, hh, 4); x.fill(); x.fillStyle = '#5e584e'; x.font = '600 10.5px system-ui'; x.save(); x.beginPath(); x.rect(a, y, z - a - 4, hh); x.clip(); x.fillText(s.name, a + 5, y + hh / 2); x.restore(); });
+  secs.forEach((s, i) => { const a = X(s.t), z = X(secs[i + 1]?.t ?? len), [y, hh] = Y.sec; x.fillStyle = i % 2 ? '#161b28' : '#1b2131'; rr(x, a, y, z - a - 2, hh, 4); x.fill(); x.fillStyle = '#8f9ab5'; x.font = '600 10.5px "Hanken Grotesk",system-ui'; x.save(); x.beginPath(); x.rect(a, y, z - a - 4, hh); x.clip(); x.fillText(s.name, a + 5, y + hh / 2); x.restore(); });
 
   const [py, ph] = Y.plan;
   if (isRef(v)) {
@@ -578,30 +578,30 @@ function draw() {
     loud(x, v, bed(v), X, Y.loud[0], Y.loud[1], len);
     for (const br of v.ref.breaks) hatch(x, X(br.t), py, X(br.t + br.d) - X(br.t), ph);
     const dr = v.ref.drums, [ly, lh] = Y.lay;
-    dr.forEach((d, i) => { const on = Math.max(0, Math.min(1, (d + 66) / 30)); if (on > 0.05) { x.fillStyle = `rgba(26,24,21,${0.12 + on * 0.6})`; x.fillRect(X(i * 0.25), ly + lh / 2 - 6, Math.max(1, X(0.25) - X(0)), 12); } });
+    dr.forEach((d, i) => { const on = Math.max(0, Math.min(1, (d + 66) / 30)); if (on > 0.05) { x.fillStyle = `rgba(232,236,247,${0.12 + on * 0.6})`; x.fillRect(X(i * 0.25), ly + lh / 2 - 6, Math.max(1, X(0.25) - X(0)), 12); } });
   } else if (o?.parts) {
     for (const p of o.parts) {
       const a = X(p.t0), z = X(p.t1);
       if (p.kind === 'break') { hatch(x, a, py, z - a, ph); continue; }
       const hh = ph * (0.25 + 0.75 * (p.level / 4)), mid = mixIds(v) ? idAt(v, (p.t0 + p.t1) / 2) : null, mt = mid && v.tries.find((q) => q.id === mid);
       x.fillStyle = mt ? hueOf(mid) : LEVEL[p.level]; rr(x, a, py + ph - hh, z - a - 1, hh, 5); x.fill();
-      if (custom && plays(v)[part]?.t0 === p.t0) { x.strokeStyle = '#1a1815'; x.lineWidth = 2; rr(x, a, py + ph - hh, z - a - 1, hh, 5); x.stroke(); }
-      x.fillStyle = mt || p.level >= 3 ? '#fff' : '#5e584e'; x.font = '600 10.5px system-ui';
+      if (custom && plays(v)[part]?.t0 === p.t0) { x.strokeStyle = '#e8ecf7'; x.lineWidth = 2; rr(x, a, py + ph - hh, z - a - 1, hh, 5); x.stroke(); }
+      x.fillStyle = mt || p.level >= 3 ? '#06101f' : '#c9d3ea'; x.font = '600 10.5px "Hanken Grotesk",system-ui';
       if (z - a > 48) x.fillText(mt ? mt.name : `${p.label ?? ''} ${p.bpm ? `${p.bpm.toFixed(1)}` : ''}`.trim(), a + 6, py + ph - hh + 11);
     }
-    if (tr?.bars) { x.fillStyle = 'rgba(26,24,21,.28)'; for (const bt of tr.bars) x.fillRect(X(bt), py + ph + 1, 1, 4); }
+    if (tr?.bars) { x.fillStyle = 'rgba(232,236,247,.28)'; for (const bt of tr.bars) x.fillRect(X(bt), py + ph + 1, 1, 4); }
     loud(x, v, b, X, Y.loud[0], Y.loud[1], len);
-    x.strokeStyle = 'rgba(185,138,30,.95)'; x.lineWidth = 1.5; x.setLineDash([3, 3]);
+    x.strokeStyle = 'rgba(255,193,90,.95)'; x.lineWidth = 1.5; x.setLineDash([3, 3]);
     for (const a of o.anchors ?? []) { x.beginPath(); x.moveTo(X(a.t), Y.said[0]); x.lineTo(X(a.t), py + ph); x.stroke(); }
     x.setLineDash([]);
     const layers = Object.entries(tr?.layers ?? {}), [ly, lh] = Y.lay, rowH = layers.length ? Math.min(14, (lh + 8) / layers.length) : 0;
-    layers.forEach(([name, spans], i) => { const y = ly + i * rowH; x.fillStyle = '#9a9285'; x.font = `500 ${Math.min(10, rowH)}px system-ui`; x.textAlign = 'right'; x.fillText(name, L - 8, y + rowH / 2); x.textAlign = 'left'; x.fillStyle = 'rgba(26,24,21,.72)'; for (const [a, z] of spans) { rr(x, X(a), y + 2, Math.max(1, X(z) - X(a) - 1), rowH - 4, 2); x.fill(); } });
-    if (!layers.length) { x.fillStyle = '#9a9285'; x.font = '500 11.5px system-ui'; x.fillText(o.parts ? 'Pick a genre to see its layers' : '', L, ly + lh / 2); }
-  } else { x.fillStyle = '#9a9285'; x.font = '500 12px system-ui'; x.fillText('Not fitted yet: the plan appears here when the engine has read the speech.', L, py + ph / 2); }
+    layers.forEach(([name, spans], i) => { const y = ly + i * rowH; x.fillStyle = '#8f9ab5'; x.font = `500 ${Math.min(10, rowH)}px "Hanken Grotesk",system-ui`; x.textAlign = 'right'; x.fillText(name, L - 8, y + rowH / 2); x.textAlign = 'left'; x.fillStyle = 'rgba(167,139,250,.75)'; for (const [a, z] of spans) { rr(x, X(a), y + 2, Math.max(1, X(z) - X(a) - 1), rowH - 4, 2); x.fill(); } });
+    if (!layers.length) { x.fillStyle = '#8f9ab5'; x.font = '500 11.5px "Hanken Grotesk",system-ui'; x.fillText(o.parts ? 'Pick a genre to see its layers' : '', L, ly + lh / 2); }
+  } else { x.fillStyle = '#8f9ab5'; x.font = '500 12px "Hanken Grotesk",system-ui'; x.fillText('Not fitted yet: the plan appears here when the engine has read the speech.', L, py + ph / 2); }
 
   const t = now(), px = X(t);
-  x.fillStyle = '#d2502f'; x.fillRect(px - 1, 14, 2, h - 14); x.beginPath(); x.arc(px, 14, 4, 0, 7); x.fill();
-  if (hover) { x.fillStyle = 'rgba(26,24,21,.35)'; x.fillRect(hover.x, 18, 1, h - 18); }
+  x.fillStyle = '#7cc4ff'; x.fillRect(px - 1, 14, 2, h - 14); x.beginPath(); x.arc(px, 14, 4, 0, 7); x.fill();
+  if (hover) { x.fillStyle = 'rgba(232,236,247,.35)'; x.fillRect(hover.x, 18, 1, h - 18); }
   $('clock').innerHTML = `${clock(t)} <i>/ ${clock(len)}</i>`;
   const ids = !isRef(v) && mixIds(v), names = ids && ids.map((id) => v.tries.find((q) => q.id === id)?.name).filter((n, i, a) => n !== a[i - 1]);
   $('scoreh').textContent = ids ? `${names.join(' → ')}${match ? `: each part matched to how fast you talk (${targets(v).map((b) => Math.round(b)).join(', ')} BPM wanted)` : ''}` : tr?.score ? `${tr.name}: ${tr.bpm} BPM, ${tr.score.cueErrorMs != null ? `every music change within ${tr.score.cueErrorMs} ms of its spoken cue, ` : ''}tempo moves at most ${tr.score.maxDriftPct}%${tr.score.attackMs != null ? `, back to full level ${tr.score.attackMs} ms after each stop` : ''}` : isRef(v) ? `${v.ref.breaks.length} full stops (hatched), level of their music in red` : '';
@@ -610,8 +610,8 @@ function level(x, lv, X, y, h, len, line) {
   if (!lv?.length) return;
   x.beginPath();
   lv.forEach((l, i) => { const px = X(Math.min(len, i * 0.25)), py = y + h - Math.max(0, Math.min(1, (l + 24) / 30)) * h; i ? x.lineTo(px, py) : x.moveTo(px, py); });
-  if (line) { x.strokeStyle = 'rgba(26,24,21,.55)'; x.lineWidth = 1; x.stroke(); return; }
-  x.lineTo(X(Math.min(len, (lv.length - 1) * 0.25)), y + h); x.lineTo(X(0), y + h); x.closePath(); x.fillStyle = 'rgba(210,80,47,.25)'; x.fill(); x.strokeStyle = '#d2502f'; x.lineWidth = 1; x.stroke();
+  if (line) { x.strokeStyle = 'rgba(232,236,247,.55)'; x.lineWidth = 1; x.stroke(); return; }
+  x.lineTo(X(Math.min(len, (lv.length - 1) * 0.25)), y + h); x.lineTo(X(0), y + h); x.closePath(); x.fillStyle = 'rgba(124,196,255,.25)'; x.fill(); x.strokeStyle = '#7cc4ff'; x.lineWidth = 1; x.stroke();
 }
 function loud(x, v, b, X, y, h, len) {
   const voice = v.levels?.voice;
@@ -620,11 +620,11 @@ function loud(x, v, b, X, y, h, len) {
   const music = segs.length && b?.level ? b.level.map((_, i) => { const s = segs.find((q) => i * 0.25 >= q.a && i * 0.25 < q.b)?.b0 ?? b; const l = s.level?.[i]; return l == null || s.med == null ? -120 : l + s.med + 20 * Math.log10(gainOf(s)); }) : [];
   const top = Math.max(...voice, ...said, ...music) + 3, span = 42, Yd = (d) => y + Math.max(0, Math.min(1, (top - d) / span)) * h;
   const area = (arr, fill, stroke) => { x.beginPath(); x.moveTo(X(0), y + h); arr.forEach((d, i) => x.lineTo(X(Math.min(len, i * 0.25)), Yd(d))); x.lineTo(X(Math.min(len, (arr.length - 1) * 0.25)), y + h); x.closePath(); x.fillStyle = fill; x.fill(); x.strokeStyle = stroke; x.lineWidth = 1; x.stroke(); };
-  if (said.length) area(said, 'rgba(31,111,107,.16)', 'rgba(31,111,107,.55)');
-  if (music.length) area(music, 'rgba(210,80,47,.32)', '#d2502f');
-  if (!b) { x.fillStyle = '#9a9285'; x.font = '500 11.5px system-ui'; x.fillText('Pick a genre to see the music against your voice', X(1), y + h / 2); }
+  if (said.length) area(said, 'rgba(255,122,168,.16)', 'rgba(255,122,168,.55)');
+  if (music.length) area(music, 'rgba(124,196,255,.32)', '#7cc4ff');
+  if (!b) { x.fillStyle = '#8f9ab5'; x.font = '500 11.5px "Hanken Grotesk",system-ui'; x.fillText('Pick a genre to see the music against your voice', X(1), y + h / 2); }
 }
-function hatch(x, a, y, w, h) { x.save(); x.beginPath(); x.rect(a, y, w, h); x.clip(); x.strokeStyle = 'rgba(26,24,21,.35)'; x.lineWidth = 1; for (let i = -h; i < w; i += 5) { x.beginPath(); x.moveTo(a + i, y + h); x.lineTo(a + i + h, y); x.stroke(); } x.restore(); }
+function hatch(x, a, y, w, h) { x.save(); x.beginPath(); x.rect(a, y, w, h); x.clip(); x.strokeStyle = 'rgba(232,236,247,.35)'; x.lineWidth = 1; for (let i = -h; i < w; i += 5) { x.beginPath(); x.moveTo(a + i, y + h); x.lineTo(a + i + h, y); x.stroke(); } x.restore(); }
 function rr(x, a, y, w, h, r) { r = Math.max(0, Math.min(r, w / 2, h / 2)); x.beginPath(); x.moveTo(a + r, y); x.arcTo(a + w, y, a + w, y + h, r); x.arcTo(a + w, y + h, a, y + h, r); x.arcTo(a, y + h, a, y, r); x.arcTo(a, y, a + w, y, r); x.closePath(); }
 function wrap(x, text, a, y, w, lh, max) { const words = text.split(' '); let line = '', n = 0; for (const wd of words) { if (x.measureText(`${line} ${wd}`).width > w && line) { x.fillText(line, a, y); y += lh; line = wd; if (++n >= max) return; } else line = line ? `${line} ${wd}` : wd; } x.fillText(line, a, y); }
 
